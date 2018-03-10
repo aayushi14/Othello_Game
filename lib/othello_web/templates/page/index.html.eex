@@ -1,0 +1,16 @@
+<h1>Othello Game</h1>
+<script>
+  function clicked() {
+    let input_val = document.getElementById("name").value
+    window.location.href = "/game/" + input_val
+    return false
+  }
+</script>
+
+<div class="row">
+  <div class="col">
+    <p>Enter your Name: <input id="name" type="text"/>
+    <button id="game-button" onclick="clicked()">Join Game</button></p>
+    <p id="game-output"></p>
+  </div>
+</div>

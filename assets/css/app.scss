@@ -1,0 +1,138 @@
+/* This file is for your main application css. */
+
+@import "bootstrap";
+
+p {
+  padding: 2px;
+  margin: 1px;
+  color: #000000;
+  font-size: 20px;
+  font-family: Georgia;
+}
+
+button, .submit {
+    background-color: #000000;
+    padding: 10px 30px;
+    margin: 1px 1px;
+    width: 220px;
+    font: 20px "Georgia", serif;
+    color: #ebebf0;
+    cursor: pointer;
+}
+
+button:hover, .submit:hover {
+    background-color: #ebebf0;
+    color: #202020;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font: 14px "Georgia", Futura, serif;
+	margin: 10px;
+  margin-left: 100px;
+}
+
+h1 {
+  text-align: center;
+  color: #000000;
+  font-family: Georgia;
+  text-decoration: underline;
+}
+
+ol, ul {
+	padding-left: 30px;
+}
+
+.player1name {
+  text-align: left;
+}
+
+.player2name {
+  text-align: right;
+}
+
+.board {
+    border: 3px solid black;
+    padding: 10px;
+    background-color: #663300;
+}
+
+.board-row:after {
+	clear: both;
+	content: '';
+	display: table;
+}
+
+.status {
+	margin-bottom: 10px;
+}
+
+.square {
+	background: #1a7f25;
+	border: 1px solid #111111;
+	float: left;
+	font-size: 24px;
+	font-weight: bold;
+	line-height: 34px;
+	height: 50px;
+	margin-right: -1px;
+	margin-top: -1px;
+	padding: 0;
+	text-align: center;
+	width: 50px;
+	border-radius: 0;
+	max-width: 13%;
+}
+
+.square:focus {
+	outline: none;
+}
+
+.kbd-navigation .square:focus {
+	background: #ddd;
+}
+
+.game {
+  clear: both;
+}
+
+.game-board {
+  display: inline-block;
+}
+
+.game-left-side {
+  float: left;
+  padding-right: 20px;
+}
+
+.game-info {
+	float: left;
+}
+
+.available-square {
+	cursor: pointer;
+}
+
+.not-available-square {
+	cursor: not-allowed;
+}
+
+.marker {
+	width: 80%;
+	height: 80%;
+	border-radius: 50%;
+	margin-left: 10%;
+	margin-top: 10%;
+}
+
+.marker.black {
+	background: #111;
+}
+
+.marker.white {
+	background: #eee;
+	border: 1px solid #111;
+}

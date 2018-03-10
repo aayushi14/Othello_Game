@@ -1,0 +1,22 @@
+<h1>Othello Game</h1>
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-10">
+      <div id="root">
+        <p>React app not loaded...</p>
+      </div>
+    </div>
+    <div class="col-sm-2">
+      <div class="row">
+        <p class="player1name">Player1 (black): <%= @game %></p>
+        <script>
+          window.gameName = "<%= @game %>";
+        </script>
+      </div>
+      <div class="row">
+        <p class="player2name">Player2 (white): <%= @game %></p>
+      </div>
+    </div>
+  </div>
+</div>
