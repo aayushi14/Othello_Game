@@ -1,50 +1,63 @@
 defmodule Othello.Game do
+  use Agent
 
   @board_squares 0..63
 
+  
   def start_link do
     Agent.start_link(fn -> %{} end, name: __MODULE__)
   end
 
-  def put(gname, game) do
-    Agent.update(__MODULE__, &Map.put(&1, gname, game))
-    game
+  def save(name, game) do
+    Agent.update __MODULE__, fn state ->
+      Map.put(state, name, game)
+    end
   end
 
-  def get(gname) do
-    Agent.get(__MODULE__, &Map.get(&1, gname))
+  def load(name) do
+    Agent.get __MODULE__, fn state ->
+      Map.get(state, name)
+    end
   end
 
-  def join(gname, user) do
-    game = get(gname)
+  def join(name, user) do
+    game = load(name)
 
     if game do
       game
     else
-      game = %{ name: gname, host: user }
-      put(gname, game)
+      game = %{ name: name, host: user }
+      save(name, game)
     end
+
   end
 
   def new do
+    initSquares = Enum.map(@board_squares, fn(_x) -> nil end)
+    initSquares = initSquares
+      |> List.insert_at(27, "X")
+      |> List.insert_at(28, "O")
+      |> List.insert_at(35, "O")
+      |> List.insert_at(36, "X")
+    IO.inspect initSquares
+    
     %{
-      squares: [],
+      squares: initSquares,
       xNumbers: 2,
       oNumbers: 2,
       xWasNext: true,
-      stepNumber: 0,
-      xIsNext: true,
+      xIsNext: true
     }
   end
 
   def client_view(game) do
-
-    initSquares = Enum.map(@board_squares, fn(x) -> nil end)
+    IO.inspect game
+    initSquares = Enum.map(@board_squares, fn(_x) -> nil end)
     initSquares = initSquares
-      |> List.insert_at(27, 'X')
-      |> List.insert_at(28, 'O')
-      |> List.insert_at(35, 'O')
-      |> List.insert_at(36, 'X')
+      |> List.insert_at(27, "X")
+      |> List.insert_at(28, "O")
+      |> List.insert_at(35, "O")
+      |> List.insert_at(36, "X")
     IO.inspect initSquares
 
    %{
@@ -52,9 +65,9 @@ defmodule Othello.Game do
       xNumbers: 2,
       oNumbers: 2,
       xWasNext: true,
-      stepNumber: 0,
       xIsNext: true
     }
+
   end
 
 end

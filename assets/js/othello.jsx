@@ -3,7 +3,7 @@
   import Board from './board.jsx';
 
   export default function game_init(root, channel) {
-    // let xNumbers: 2, oNumbers: 2, xWasNext: true;
+    
     ReactDOM.render(<Othello channel={channel} />, root);
   }
 
@@ -16,21 +16,22 @@
       [initSquares[8 * 3 + 3], initSquares[8 * 3 + 4], initSquares[8 * 4 + 4], initSquares[8 * 4 + 3]] = ['X', 'O', 'X', 'O'];
 
       this.state = {
-        history: [{
           squares: initSquares,
           xNumbers: 2,
           oNumbers: 2,
-          xWasNext: true }],
-          stepNumber: 0,
+          xWasNext: true,
           xIsNext: true
         };
+
         this.channel.join()
-        .receive("ok", this.gotView.bind(this))
-        .receive("error", resp => { console.log("Unable to join", resp) });
+          .receive("ok", this.gotView.bind(this))
+          .receive("error", resp => { console.log("Unable to join", resp) });
       }
 
       gotView(view) {
-        this.setState(view.game);
+        //this.setState(view.game);
+        this.channel.push("othello", {"state": view.game.state})
+          .receive("ok", (resp) => console.log("resp", resp))
       }
 
       calculateWinner(xNumbers, oNumbers) {
@@ -88,14 +89,12 @@
       }
 
       handleClick(i) {
-        const history = this.state.history.slice(0, this.state.stepNumber + 1);
-        const current = history[this.state.stepNumber];
-        console.log(history);
-        if (this.calculateWinner(current.xNumbers, current.oNumbers) || current.squares[i]) {
+        console.log(this.state);
+        if (this.calculateWinner(this.state.xNumbers, this.state.oNumbers) || this.state.squares[i]) {
           return;
         }
 
-        const changedSquares = this.flipSquares(current.squares, i, this.state.xIsNext);
+        const changedSquares = this.flipSquares(this.state.squares, i, this.state.xIsNext);
 
         if (changedSquares === null) {
           return;
@@ -107,14 +106,11 @@
         let shouldTurnColor = this.checkAvailableMoves(!this.state.xIsNext, changedSquares).length > 0 ? !this.state.xIsNext : this.state.xIsNext
 
         this.setState({
-          history: history.concat([{
             squares: changedSquares,
             xNumbers: xNumbers,
             oNumbers: oNumbers,
-            xWasNext: shouldTurnColor
-          }]),
-          stepNumber: history.length,
-          xIsNext: shouldTurnColor,
+            xWasNext: shouldTurnColor,
+            xIsNext: shouldTurnColor
         });
       }
 
@@ -138,34 +134,15 @@
       }
 
       render() {
-      		const history = this.state.history.slice();
-      		const current = history[this.state.stepNumber];
-          console.log(current);
-          console.log(history);
-      		let winner = this.calculateWinner(current.xNumbers, current.oNumbers);
+          console.log(this.state);
+          
+      		let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
 
-      		const moves = history.map((step, move) => {
-      			const desc = move ? 'Go to move #' + move : 'Go to game start';
-      			return (
-      				<option key={move} value={move}>
-      					{desc}
-      				</option>
-      			);
-      		});
-
-      		const selectMoves = () => {
-      			return (
-      				<select className="select" id="dropdown" ref={(input) => this.selectedMove = input} onChange={() => this.jumpTo(this.selectedMove.value)} value={this.state.stepNumber}>
-      					{moves}
-      				</select>
-      			)
-      		}
-
-      		let availableMoves = this.checkAvailableMoves(current.xWasNext, current.squares);
-      		let availableMovesOpposite = this.checkAvailableMoves(!current.xWasNext, current.squares);
+      		let availableMoves = this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+      		let availableMovesOpposite = this.checkAvailableMoves(!this.state.xWasNext, this.state.squares);
 
       		if ((availableMoves.length === 0) && (availableMovesOpposite.length === 0)) {
-      			winner = current.xNumbers === current.oNumbers ? 'XO' : current.xNumbers > current.oNumbers ? 'X' : 'O';
+      			winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
       		}
 
       		let status =
@@ -177,16 +154,15 @@
       			<div className="game">
               <div className="game-left-side">
                 <div className="game-board">
-            			<Board squares={current.squares} availableMoves={availableMoves} onClick={(i) => this.handleClick(i)} />
+            			<Board squares={this.state.squares} availableMoves={availableMoves} onClick={(i) => this.handleClick(i)} />
             		</div>
             		<div></div>
               </div>
               <div className="game-info">
-                <div>Black markers: {current.xNumbers}</div>
-          			<div>White markers: {current.oNumbers}</div>
+                <div>Black markers: {this.state.xNumbers}</div>
+          			<div>White markers: {this.state.oNumbers}</div>
           			<br />
-          			<div>Select a previous move:</div>
-          			<div>{selectMoves()}</div>
+          	
           			<br />
                 <div className="game-status">{status}&nbsp;{winner ? <button onClick={() => this.resetGame()}>Play again</button> : ''}</div>
               </div>

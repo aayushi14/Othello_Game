@@ -31745,7 +31745,7 @@ function start() {
   var root = document.getElementById('root');
 
   if (root) {
-    var channel = _socket2.default.channel("games:" + window.gameName, {});
+    var channel = _socket2.default.channel("game:" + window.gameName, {});
     (0, _othello2.default)(root, channel);
   }
 } // Brunch automatically concatenates all files in your
@@ -31877,7 +31877,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function game_init(root, channel) {
-  // let xNumbers: 2, oNumbers: 2, xWasNext: true;
+
   _reactDom2.default.render(_react2.default.createElement(Othello, { channel: channel }), root);
 }
 
@@ -31900,14 +31900,13 @@ var Othello = function (_React$Component) {
 
 
     _this.state = {
-      history: [{
-        squares: initSquares,
-        xNumbers: 2,
-        oNumbers: 2,
-        xWasNext: true }],
-      stepNumber: 0,
+      squares: initSquares,
+      xNumbers: 2,
+      oNumbers: 2,
+      xWasNext: true,
       xIsNext: true
     };
+
     _this.channel.join().receive("ok", _this.gotView.bind(_this)).receive("error", function (resp) {
       console.log("Unable to join", resp);
     });
@@ -31917,7 +31916,10 @@ var Othello = function (_React$Component) {
   _createClass(Othello, [{
     key: 'gotView',
     value: function gotView(view) {
-      this.setState(view.game);
+      //this.setState(view.game);
+      this.channel.push("othello", { "state": view.game.state }).receive("ok", function (resp) {
+        return console.log("resp", resp);
+      });
     }
   }, {
     key: 'calculateWinner',
@@ -31991,14 +31993,12 @@ var Othello = function (_React$Component) {
   }, {
     key: 'handleClick',
     value: function handleClick(i) {
-      var history = this.state.history.slice(0, this.state.stepNumber + 1);
-      var current = history[this.state.stepNumber];
-      console.log(history);
-      if (this.calculateWinner(current.xNumbers, current.oNumbers) || current.squares[i]) {
+      console.log(this.state);
+      if (this.calculateWinner(this.state.xNumbers, this.state.oNumbers) || this.state.squares[i]) {
         return;
       }
 
-      var changedSquares = this.flipSquares(current.squares, i, this.state.xIsNext);
+      var changedSquares = this.flipSquares(this.state.squares, i, this.state.xIsNext);
 
       if (changedSquares === null) {
         return;
@@ -32014,13 +32014,10 @@ var Othello = function (_React$Component) {
       var shouldTurnColor = this.checkAvailableMoves(!this.state.xIsNext, changedSquares).length > 0 ? !this.state.xIsNext : this.state.xIsNext;
 
       this.setState({
-        history: history.concat([{
-          squares: changedSquares,
-          xNumbers: xNumbers,
-          oNumbers: oNumbers,
-          xWasNext: shouldTurnColor
-        }]),
-        stepNumber: history.length,
+        squares: changedSquares,
+        xNumbers: xNumbers,
+        oNumbers: oNumbers,
+        xWasNext: shouldTurnColor,
         xIsNext: shouldTurnColor
       });
     }
@@ -32050,38 +32047,15 @@ var Othello = function (_React$Component) {
     value: function render() {
       var _this3 = this;
 
-      var history = this.state.history.slice();
-      var current = history[this.state.stepNumber];
-      console.log(current);
-      console.log(history);
-      var winner = this.calculateWinner(current.xNumbers, current.oNumbers);
+      console.log(this.state);
 
-      var moves = history.map(function (step, move) {
-        var desc = move ? 'Go to move #' + move : 'Go to game start';
-        return _react2.default.createElement(
-          'option',
-          { key: move, value: move },
-          desc
-        );
-      });
+      var winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
 
-      var selectMoves = function selectMoves() {
-        return _react2.default.createElement(
-          'select',
-          { className: 'select', id: 'dropdown', ref: function ref(input) {
-              return _this3.selectedMove = input;
-            }, onChange: function onChange() {
-              return _this3.jumpTo(_this3.selectedMove.value);
-            }, value: _this3.state.stepNumber },
-          moves
-        );
-      };
-
-      var availableMoves = this.checkAvailableMoves(current.xWasNext, current.squares);
-      var availableMovesOpposite = this.checkAvailableMoves(!current.xWasNext, current.squares);
+      var availableMoves = this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+      var availableMovesOpposite = this.checkAvailableMoves(!this.state.xWasNext, this.state.squares);
 
       if (availableMoves.length === 0 && availableMovesOpposite.length === 0) {
-        winner = current.xNumbers === current.oNumbers ? 'XO' : current.xNumbers > current.oNumbers ? 'X' : 'O';
+        winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
       }
 
       var status = winner ? winner === 'XO' ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') : [this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', availableMoves.length, ' available moves.'].join('');
@@ -32095,7 +32069,7 @@ var Othello = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'game-board' },
-            _react2.default.createElement(_board2.default, { squares: current.squares, availableMoves: availableMoves, onClick: function onClick(i) {
+            _react2.default.createElement(_board2.default, { squares: this.state.squares, availableMoves: availableMoves, onClick: function onClick(i) {
                 return _this3.handleClick(i);
               } })
           ),
@@ -32108,25 +32082,15 @@ var Othello = function (_React$Component) {
             'div',
             null,
             'Black markers: ',
-            current.xNumbers
+            this.state.xNumbers
           ),
           _react2.default.createElement(
             'div',
             null,
             'White markers: ',
-            current.oNumbers
+            this.state.oNumbers
           ),
           _react2.default.createElement('br', null),
-          _react2.default.createElement(
-            'div',
-            null,
-            'Select a previous move:'
-          ),
-          _react2.default.createElement(
-            'div',
-            null,
-            selectMoves()
-          ),
           _react2.default.createElement('br', null),
           _react2.default.createElement(
             'div',

@@ -4,37 +4,33 @@ defmodule OthelloWeb.GamesChannel do
   alias Othello.Game
   alias Phoenix.Socket
 
-  def join("games:" <> gname, payload, socket) do
+  def join("game:" <> name, payload, socket) do
+    # game = Game.get(name) || Game.new()
+    # IO.puts "-*-*-*-*-*-*-*-*-*-*-*-*-"
+    #IO.inspect game
+    # IO.inspect payload
+    # IO.puts "-*-*-*-*-*-*-*-*-*-*-*-*-"
+
+    #state = game|> Map.get(:state);
+
+    #IO.inspect state
+
     if authorized?(payload) do
-      # newState = if(Othello.GameBackup.load(name)) do
-      #   Othello.GameBackup.load(name)
-      #   else
-      #   game = Game.client_view(Game.new())
-      # end
+      IO.puts "-*-*-*-*-*-*-*-*-*-*-*-*-"
+      IO.inspect socket
+      #game = Othello.GameBackup.load(name) || Game.new()
       socket = socket
-      |> Socket.assign(:name, gname)
+      |> Socket.assign(:name, name)
+      #|> assign(:game, game)
       |> Socket.assign(:user, payload["user"])
-      # {:ok, %{"join" => name, "game" => newState}, socket}
-      {:ok, socket}
+      IO.inspect socket
+      IO.puts "-*-*-*-*-*-*-*-*-*-*-*-*-"
+
+      {:ok, %{"join" => name, "user" => payload["user"]}, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
   end
-
-  def handle_in("doReset", %{}, socket) do
-    game = Game.doReset(socket.assigns[:game])
-    socket = assign(socket, :game, game)
-    Othello.GameBackup.save(socket.assigns[:name], game)
-    {:reply, {:ok, %{"game" => game}}, socket}
-  end
-
-  def handle_in("loadNew", %{}, socket) do
-    game = Game.loadNew(socket.assigns[:game])
-    Othello.GameBackup.save(socket.assigns[:name], game)
-    socket = assign(socket, :game, game)
-    {:reply, {:ok, %{"game" => game}}, socket}
-  end
-
 
   # Add authorization logic here as required.
   defp authorized?(_payload) do

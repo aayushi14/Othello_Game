@@ -3,20 +3,25 @@ defmodule OthelloWeb.GameController do
   alias Othello.Game
 
 
-  def show(conn, %{"gname" => gname}) do
-    user = get_session(conn, :user)
-    game = Game.get(gname)
-    host = (user == game[:host])
+  # def show(conn, %{"name" => name}) do
+  #   user = get_session(conn, :user)
+  #   game = Game.load(name)
 
-    if !is_nil(user) and !is_nil(game) do
-      render conn, "show.html", user: user, host: host, game: gname
+  #   #state = game[:state]
 
-    else
-      conn
-      |> put_flash(:error, "Bad user or game chosen")
-      |> redirect(to: "/")
+  #   host = (user == game[:host])
 
-    end
+  #   if !is_nil(user) and !is_nil(game) do
+  #     render conn, "show.html", user: user, host: host, game: name
+  #   else
+  #     conn
+  #     |> put_flash(:error, "Bad user or game chosen")
+  #     |> redirect(to: "/")
+
+  #   end
+  # end
+  def show(conn, params) do
+    render conn, "show.html", game: params["game"]
   end
 
 
