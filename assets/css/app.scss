@@ -3,26 +3,26 @@
 @import "bootstrap";
 
 p {
-  padding: 2px;
-  margin: 1px;
-  color: #000000;
-  font-size: 20px;
-  font-family: Georgia;
+	padding: 2px;
+	margin: 1px;
+	color: #000000;
+	font-size: 20px;
+	font-family: "Century Gothic", Futura, sans-serif;
 }
 
 button, .submit {
-    background-color: #000000;
-    padding: 10px 30px;
-    margin: 1px 1px;
-    width: 220px;
-    font: 20px "Georgia", serif;
-    color: #ebebf0;
-    cursor: pointer;
+	background-color: #000000;
+	padding: 10px 30px;
+	margin: 1px 1px;
+	width: 220px;
+	font: 20px "Century Gothic", Futura, sans-serif;
+	color: #ebebf0;
+	cursor: pointer;
 }
 
 button:hover, .submit:hover {
-    background-color: #ebebf0;
-    color: #202020;
+	background-color: #ebebf0;
+	color: #202020;
 }
 
 * {
@@ -30,16 +30,19 @@ button:hover, .submit:hover {
 }
 
 body {
-	font: 14px "Georgia", Futura, serif;
+	font: 20px "Century Gothic", Futura, sans-serif;
 	margin: 10px;
-  margin-left: 100px;
+	margin-left: 100px;
 }
-
+.players {
+	margin-left: 450px;
+	margin-top: -200px;
+}
 h1 {
-  text-align: center;
-  color: #000000;
-  font-family: Georgia;
-  text-decoration: underline;
+	text-align: center;
+	color: #000000;
+	font-family: Georgia;
+	text-decoration: underline;
 }
 
 ol, ul {
@@ -47,17 +50,17 @@ ol, ul {
 }
 
 .player1name {
-  text-align: left;
+	text-align: left;
 }
 
 .player2name {
-  text-align: right;
+	text-align: right;
 }
 
 .board {
-    border: 3px solid black;
-    padding: 10px;
-    background-color: #663300;
+	border: 3px solid black;
+	padding: 10px;
+	background-color: #663300;
 }
 
 .board-row:after {
@@ -96,16 +99,16 @@ ol, ul {
 }
 
 .game {
-  clear: both;
+	clear: both;
 }
 
 .game-board {
-  display: inline-block;
+	display: inline-block;
 }
 
 .game-left-side {
-  float: left;
-  padding-right: 20px;
+	float: left;
+	padding-right: 20px;
 }
 
 .game-info {

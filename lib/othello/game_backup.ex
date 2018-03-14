@@ -16,4 +16,5 @@ defmodule Othello.GameBackup do
       Map.get(state, name)
     end
   end
+
 end

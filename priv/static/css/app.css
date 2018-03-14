@@ -6032,14 +6032,14 @@ p {
   margin: 1px;
   color: #000000;
   font-size: 20px;
-  font-family: Georgia; }
+  font-family: "Century Gothic", Futura, sans-serif; }
 
 button, .submit {
   background-color: #000000;
   padding: 10px 30px;
   margin: 1px 1px;
   width: 220px;
-  font: 20px "Georgia", serif;
+  font: 20px "Century Gothic", Futura, sans-serif;
   color: #ebebf0;
   cursor: pointer; }
 
@@ -6051,9 +6051,13 @@ button:hover, .submit:hover {
   box-sizing: border-box; }
 
 body {
-  font: 14px "Georgia", Futura, serif;
+  font: 20px "Century Gothic", Futura, sans-serif;
   margin: 10px;
   margin-left: 100px; }
+
+.players {
+  margin-left: 450px;
+  margin-top: -200px; }
 
 h1 {
   text-align: center;

@@ -3,7 +3,7 @@
   import Board from './board.jsx';
 
   export default function game_init(root, channel) {
-    let xNumbers: 2, oNumbers: 2, xWasNext: true;
+    
     ReactDOM.render(<Othello channel={channel} />, root);
   }
 
@@ -11,25 +11,29 @@
     constructor(props) {
       super(props);
       this.channel = props.channel;
+      
       const initSquares = Array(64).fill(null);
       [initSquares[8 * 3 + 3], initSquares[8 * 3 + 4], initSquares[8 * 4 + 4], initSquares[8 * 4 + 3]] = ['X', 'O', 'X', 'O'];
 
       this.state = {
-        history: [{
           squares: initSquares,
           xNumbers: 2,
           oNumbers: 2,
-          xWasNext: true }],
-          stepNumber: 0,
+          xWasNext: true,
           xIsNext: true
         };
+
         this.channel.join()
-        .receive("ok", this.gotView.bind(this))
-        .receive("error", resp => { console.log("Unable to join", resp) });
+          .receive("ok", this.gotView.bind(this))
+          .receive("error", resp => { console.log("Unable to join", resp) });
+        //this.channel.on("othello", state => );
       }
 
       gotView(view) {
-        this.setState(view.game);
+        console.log(view.game.state)
+        this.channel.push("othello", {"state": view.game.state})
+          .receive("ok", (resp) => console.log("resp", resp))
+        this.setState(view.game.state);
       }
 
       calculateWinner(xNumbers, oNumbers) {
@@ -87,14 +91,15 @@
       }
 
       handleClick(i) {
-        const history = this.state.history.slice(0, this.state.stepNumber + 1);
-        const current = history[this.state.stepNumber];
-
-        if (this.calculateWinner(current.xNumbers, current.oNumbers) || current.squares[i]) {
+        console.log(this.state);
+        this.channel.push("othello", {"state": this.state})
+          .receive("ok", (resp) => console.log("resp", resp))
+          
+        if (this.calculateWinner(this.state.xNumbers, this.state.oNumbers) || this.state.squares[i]) {
           return;
         }
 
-        const changedSquares = this.flipSquares(current.squares, i, this.state.xIsNext);
+        const changedSquares = this.flipSquares(this.state.squares, i, this.state.xIsNext);
 
         if (changedSquares === null) {
           return;
@@ -106,21 +111,11 @@
         let shouldTurnColor = this.checkAvailableMoves(!this.state.xIsNext, changedSquares).length > 0 ? !this.state.xIsNext : this.state.xIsNext
 
         this.setState({
-          history: history.concat([{
             squares: changedSquares,
             xNumbers: xNumbers,
             oNumbers: oNumbers,
-            xWasNext: shouldTurnColor
-          }]),
-          stepNumber: history.length,
-          xIsNext: shouldTurnColor,
-        });
-      }
-
-      jumpTo(step) {
-        this.setState({
-          stepNumber: parseInt(step, 0),
-          xIsNext: this.state.history[step].xWasNext
+            xWasNext: shouldTurnColor,
+            xIsNext: shouldTurnColor
         });
       }
 
@@ -137,33 +132,15 @@
       }
 
       render() {
-      		const history = this.state.history.slice();
-      		const current = history[this.state.stepNumber];
+          //console.log(this.state);
+          
+      		let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
 
-      		let winner = this.calculateWinner(current.xNumbers, current.oNumbers);
-
-      		const moves = history.map((step, move) => {
-      			const desc = move ? 'Go to move #' + move : 'Go to game start';
-      			return (
-      				<option key={move} value={move}>
-      					{desc}
-      				</option>
-      			);
-      		});
-
-      		const selectMoves = () => {
-      			return (
-      				<select className="custom-select" id="dropdown" ref={(input) => this.selectedMove = input} onChange={() => this.jumpTo(this.selectedMove.value)} value={this.state.stepNumber}>
-      					{moves}
-      				</select>
-      			)
-      		}
-
-      		let availableMoves = this.checkAvailableMoves(current.xWasNext, current.squares);
-      		let availableMovesOpposite = this.checkAvailableMoves(!current.xWasNext, current.squares);
+      		let availableMoves = this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+      		let availableMovesOpposite = this.checkAvailableMoves(!this.state.xWasNext, this.state.squares);
 
       		if ((availableMoves.length === 0) && (availableMovesOpposite.length === 0)) {
-      			winner = current.xNumbers === current.oNumbers ? 'XO' : current.xNumbers > current.oNumbers ? 'X' : 'O';
+      			winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
       		}
 
       		let status =
@@ -175,16 +152,15 @@
       			<div className="game">
               <div className="game-left-side">
                 <div className="game-board">
-            			<Board squares={current.squares} availableMoves={availableMoves} onClick={(i) => this.handleClick(i)} />
+            			<Board squares={this.state.squares} availableMoves={availableMoves} onClick={(i) => this.handleClick(i)} />
             		</div>
             		<div></div>
               </div>
               <div className="game-info">
-                <div>Black markers: {current.xNumbers}</div>
-          			<div>White markers: {current.oNumbers}</div>
+                <div>Black markers: {this.state.xNumbers}</div>
+          			<div>White markers: {this.state.oNumbers}</div>
           			<br />
-          			<div>Select a previous move:</div>
-          			<div>{selectMoves()}</div>
+          	
           			<br />
                 <div className="game-status">{status}&nbsp;{winner ? <button onClick={() => this.resetGame()}>Play again</button> : ''}</div>
               </div>
@@ -192,45 +168,3 @@
       		);
       }
   }
-
-/*
-  resetState() {
-    this.channel.push("doReset")
-    .receive("ok", this.gotView.bind(this));
-  }
-
-  showTiles(id) {
-    this.channel.push("showTile", {opentile: id})
-    .receive("ok", this.gotView.bind(this));
-  }
-
-  differentTiles(queArray, opentile1, opentile2, disableClick) {
-    this.channel.push("diffTiles", {queArray: queArray, opentile1:16, opentile2:16, disableClick: false})
-    .receive("ok", this.gotView.bind(this));
-  }
-
-  componentDidUpdate() {
-    let queArray = this.state.queArray;
-    let opentile1 = this.state.opentile1;
-    let opentile2 = this.state.opentile2;
-    let disableClick = this.state.disableClick;
-
-    if (opentile1 != 16 && opentile2 != 16 && queArray[opentile1] != queArray[opentile2]) {
-      setTimeout(() => this.differentTiles(queArray, opentile1, opentile2, disableClick), 1000);
-    }
-  }
-
-  render() {
-    return (
-      {this.state.queArray.map((letter, i) => <button className="tile"
-      onClick={() => {this.showTiles(i)}} key={"letter" + i} id={i}
-      disabled={this.state.disableClick}>
-      <b>{letter}</b></button>)}
-      <p>Number of Clicks: {this.state.totalClicks}</p>
-      <p>Score: {this.state.score}/80</p>
-      <button className="button" onClick={() => {this.resetState();}}>Reset Game</button>
-      <button className="button" onClick={() => {this.resetState(); this.newGame();}}>New Game</button>
-    );
-  }
-  }
-*/

@@ -12761,6 +12761,58 @@ var Timer = function () {
   })();
 });
 
+require.register("phoenix_html/priv/static/phoenix_html.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "phoenix_html");
+  (function() {
+    "use strict";
+
+(function() {
+  function buildHiddenInput(name, value) {
+    var input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    return input;
+  }
+
+  function handleLinkClick(link) {
+    var message = link.getAttribute("data-confirm");
+    if(message && !window.confirm(message)) {
+        return;
+    }
+
+    var to = link.getAttribute("data-to"),
+        method = buildHiddenInput("_method", link.getAttribute("data-method")),
+        csrf = buildHiddenInput("_csrf_token", link.getAttribute("data-csrf")),
+        form = document.createElement("form");
+
+    form.method = (link.getAttribute("data-method") === "get") ? "get" : "post";
+    form.action = to;
+    form.style.display = "hidden";
+
+    form.appendChild(csrf);
+    form.appendChild(method);
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  window.addEventListener("click", function(e) {
+    var element = e.target;
+
+    while (element && element.getAttribute) {
+      if(element.getAttribute("data-method")) {
+        handleLinkClick(element);
+        e.preventDefault();
+        return false;
+      } else {
+        element = element.parentNode;
+      }
+    }
+  }, false);
+})();
+  })();
+});
+
 require.register("process/browser.js", function(exports, require, module) {
   require = __makeRelativeRequire(require, {}, "process");
   (function() {
@@ -31672,6 +31724,8 @@ require.register("underscore/underscore.js", function(exports, require, module) 
 require.register("js/app.js", function(exports, require, module) {
 "use strict";
 
+require("phoenix_html");
+
 var _socket = require("./socket");
 
 var _socket2 = _interopRequireDefault(_socket);
@@ -31682,7 +31736,19 @@ var _othello2 = _interopRequireDefault(_othello);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Brunch automatically concatenates all files in your
+// Import local files
+//
+// Local files can be imported directly using relative
+// paths "./socket" or full ones "web/static/js/socket".
+
+function start() {
+  var root = document.getElementById('root');
+
+  if (root) {
+    var channel = _socket2.default.channel("game:" + window.gameName, {});
+    (0, _othello2.default)(root, channel);
+  }
+} // Brunch automatically concatenates all files in your
 // watched paths. Those paths can be configured at
 // config.paths.watched in "brunch-config.js".
 //
@@ -31697,31 +31763,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // to also remove its path from "config.paths.watched".
 // import "phoenix_html";
 
-// Import local files
-//
-// Local files can be imported directly using relative
-// paths "./socket" or full ones "web/static/js/socket".
-
-function form_init() {
-  var channel = _socket2.default.channel("games:demo", {});
-  channel.join().receive("ok", function (resp) {
-    console.log("Joined successfully", resp);
-  }).receive("error", function (resp) {
-    console.log("Unable to join", resp);
-  });
-}
-
-function start() {
-  var root = document.getElementById('root');
-  if (root) {
-    var channel = _socket2.default.channel("games:" + window.gameName, {});
-    (0, _othello2.default)(root, channel);
-  }
-
-  if (document.getElementById('index-page')) {
-    form_init();
-  }
-}
 
 $(start);
 
@@ -31836,9 +31877,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function game_init(root, channel) {
-  var xNumbers = void 0,
-      oNumbers = void 0,
-      xWasNext = void 0;
+
   _reactDom2.default.render(_react2.default.createElement(Othello, { channel: channel }), root);
 }
 
@@ -31851,6 +31890,7 @@ var Othello = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (Othello.__proto__ || Object.getPrototypeOf(Othello)).call(this, props));
 
     _this.channel = props.channel;
+
     var initSquares = Array(64).fill(null);
     var _ref = ['X', 'O', 'X', 'O'];
     initSquares[8 * 3 + 3] = _ref[0];
@@ -31860,24 +31900,28 @@ var Othello = function (_React$Component) {
 
 
     _this.state = {
-      history: [{
-        squares: initSquares,
-        xNumbers: 2,
-        oNumbers: 2,
-        xWasNext: true }],
-      stepNumber: 0,
+      squares: initSquares,
+      xNumbers: 2,
+      oNumbers: 2,
+      xWasNext: true,
       xIsNext: true
     };
+
     _this.channel.join().receive("ok", _this.gotView.bind(_this)).receive("error", function (resp) {
       console.log("Unable to join", resp);
     });
+    //this.channel.on("othello", state => );
     return _this;
   }
 
   _createClass(Othello, [{
     key: 'gotView',
     value: function gotView(view) {
-      this.setState(view.game);
+      console.log(view.game.state);
+      this.channel.push("othello", { "state": view.game.state }).receive("ok", function (resp) {
+        return console.log("resp", resp);
+      });
+      this.setState(view.game.state);
     }
   }, {
     key: 'calculateWinner',
@@ -31951,14 +31995,16 @@ var Othello = function (_React$Component) {
   }, {
     key: 'handleClick',
     value: function handleClick(i) {
-      var history = this.state.history.slice(0, this.state.stepNumber + 1);
-      var current = history[this.state.stepNumber];
+      console.log(this.state);
+      this.channel.push("othello", { "state": this.state }).receive("ok", function (resp) {
+        return console.log("resp", resp);
+      });
 
-      if (this.calculateWinner(current.xNumbers, current.oNumbers) || current.squares[i]) {
+      if (this.calculateWinner(this.state.xNumbers, this.state.oNumbers) || this.state.squares[i]) {
         return;
       }
 
-      var changedSquares = this.flipSquares(current.squares, i, this.state.xIsNext);
+      var changedSquares = this.flipSquares(this.state.squares, i, this.state.xIsNext);
 
       if (changedSquares === null) {
         return;
@@ -31974,22 +32020,11 @@ var Othello = function (_React$Component) {
       var shouldTurnColor = this.checkAvailableMoves(!this.state.xIsNext, changedSquares).length > 0 ? !this.state.xIsNext : this.state.xIsNext;
 
       this.setState({
-        history: history.concat([{
-          squares: changedSquares,
-          xNumbers: xNumbers,
-          oNumbers: oNumbers,
-          xWasNext: shouldTurnColor
-        }]),
-        stepNumber: history.length,
+        squares: changedSquares,
+        xNumbers: xNumbers,
+        oNumbers: oNumbers,
+        xWasNext: shouldTurnColor,
         xIsNext: shouldTurnColor
-      });
-    }
-  }, {
-    key: 'jumpTo',
-    value: function jumpTo(step) {
-      this.setState({
-        stepNumber: parseInt(step, 0),
-        xIsNext: this.state.history[step].xWasNext
       });
     }
   }, {
@@ -32010,37 +32045,15 @@ var Othello = function (_React$Component) {
     value: function render() {
       var _this3 = this;
 
-      var history = this.state.history.slice();
-      var current = history[this.state.stepNumber];
+      //console.log(this.state);
 
-      var winner = this.calculateWinner(current.xNumbers, current.oNumbers);
+      var winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
 
-      var moves = history.map(function (step, move) {
-        var desc = move ? 'Go to move #' + move : 'Go to game start';
-        return _react2.default.createElement(
-          'option',
-          { key: move, value: move },
-          desc
-        );
-      });
-
-      var selectMoves = function selectMoves() {
-        return _react2.default.createElement(
-          'select',
-          { className: 'custom-select', id: 'dropdown', ref: function ref(input) {
-              return _this3.selectedMove = input;
-            }, onChange: function onChange() {
-              return _this3.jumpTo(_this3.selectedMove.value);
-            }, value: _this3.state.stepNumber },
-          moves
-        );
-      };
-
-      var availableMoves = this.checkAvailableMoves(current.xWasNext, current.squares);
-      var availableMovesOpposite = this.checkAvailableMoves(!current.xWasNext, current.squares);
+      var availableMoves = this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+      var availableMovesOpposite = this.checkAvailableMoves(!this.state.xWasNext, this.state.squares);
 
       if (availableMoves.length === 0 && availableMovesOpposite.length === 0) {
-        winner = current.xNumbers === current.oNumbers ? 'XO' : current.xNumbers > current.oNumbers ? 'X' : 'O';
+        winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
       }
 
       var status = winner ? winner === 'XO' ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') : [this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', availableMoves.length, ' available moves.'].join('');
@@ -32054,7 +32067,7 @@ var Othello = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'game-board' },
-            _react2.default.createElement(_board2.default, { squares: current.squares, availableMoves: availableMoves, onClick: function onClick(i) {
+            _react2.default.createElement(_board2.default, { squares: this.state.squares, availableMoves: availableMoves, onClick: function onClick(i) {
                 return _this3.handleClick(i);
               } })
           ),
@@ -32067,25 +32080,15 @@ var Othello = function (_React$Component) {
             'div',
             null,
             'Black markers: ',
-            current.xNumbers
+            this.state.xNumbers
           ),
           _react2.default.createElement(
             'div',
             null,
             'White markers: ',
-            current.oNumbers
+            this.state.oNumbers
           ),
           _react2.default.createElement('br', null),
-          _react2.default.createElement(
-            'div',
-            null,
-            'Select a previous move:'
-          ),
-          _react2.default.createElement(
-            'div',
-            null,
-            selectMoves()
-          ),
           _react2.default.createElement('br', null),
           _react2.default.createElement(
             'div',
@@ -32108,51 +32111,9 @@ var Othello = function (_React$Component) {
   return Othello;
 }(_react2.default.Component);
 
-/*
-  resetState() {
-    this.channel.push("doReset")
-    .receive("ok", this.gotView.bind(this));
-  }
-
-  showTiles(id) {
-    this.channel.push("showTile", {opentile: id})
-    .receive("ok", this.gotView.bind(this));
-  }
-
-  differentTiles(queArray, opentile1, opentile2, disableClick) {
-    this.channel.push("diffTiles", {queArray: queArray, opentile1:16, opentile2:16, disableClick: false})
-    .receive("ok", this.gotView.bind(this));
-  }
-
-  componentDidUpdate() {
-    let queArray = this.state.queArray;
-    let opentile1 = this.state.opentile1;
-    let opentile2 = this.state.opentile2;
-    let disableClick = this.state.disableClick;
-
-    if (opentile1 != 16 && opentile2 != 16 && queArray[opentile1] != queArray[opentile2]) {
-      setTimeout(() => this.differentTiles(queArray, opentile1, opentile2, disableClick), 1000);
-    }
-  }
-
-  render() {
-    return (
-      {this.state.queArray.map((letter, i) => <button className="tile"
-      onClick={() => {this.showTiles(i)}} key={"letter" + i} id={i}
-      disabled={this.state.disableClick}>
-      <b>{letter}</b></button>)}
-      <p>Number of Clicks: {this.state.totalClicks}</p>
-      <p>Score: {this.state.score}/80</p>
-      <button className="button" onClick={() => {this.resetState();}}>Reset Game</button>
-      <button className="button" onClick={() => {this.resetState(); this.newGame();}}>New Game</button>
-    );
-  }
-  }
-*/
-
 });
 
-;require.register("js/socket.js", function(exports, require, module) {
+require.register("js/socket.js", function(exports, require, module) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32247,6 +32208,7 @@ function Square(props) {
 
 ;require.alias("jquery/dist/jquery.js", "jquery");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");
+require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
 require.alias("process/browser.js", "process");
 require.alias("underscore/underscore.js", "underscore");process = require('process');require.register("___globals___", function(exports, require, module) {
   
