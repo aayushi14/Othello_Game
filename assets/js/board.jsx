@@ -8,9 +8,10 @@ export default class Board extends Component {
 			<Square
 			key={i}
 			isAvailable={this.props.availableMoves.indexOf(i) > -1}
-			value={this.props.squares[i]}
+			value={this.props[i]}
 			onClick={() => this.props.onClick(i)} />
 		);
+		console.log(this.props[i]);
 	}
 
 	render() {

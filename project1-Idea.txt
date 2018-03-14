@@ -1,0 +1,43 @@
+CS5610 - Web Development
+Project 1A Proposal 
+Aayushi Maheshwari
+Arcylizet Iniguez Flores
+
+We will be implementing the game board game, Othello. 
+General game play rules were taken from 
+https://en.wikipedia.org/wiki/Reversi.
+
+
+User GUI
+
+Users will be presented with a green 8x8 uncheckered board, indexed A to H on 
+the x-axis and 1 through 8 on the y-axis. The game contains 64 disk pieces of 
+white color on one side and black on the other. To start with, four disks will 
+be placed at the center of the board, two black disks placed on the 4E and 5D 
+positions, and two white disks placed on 4D and 5E. Possible moves will be 
+highlighted at each turn. A Reset button will be provided to reset the game, 
+at any point of the game, and by any player. Scores will be displayed at the 
+bottom of the board, keeping track of the number of disks of each color 
+currently visible on the board. The names of the two players will be visible 
+on the screen, with their names being highlighted, depending on whose turn it is. 
+
+Player Actions
+
+Users will be randomly assigned a color; the player with the black disks, 
+starts the game. 
+Players take turns placing disks of their color on the board. Disks can be 
+moved diagonally, horizontally, and vertically. There are two possible ways a 
+player can move. Either a player's disk jumps over a single disk of the opponent 
+or the player's disk jumps over a sequence of adjacent disks of the opponent, 
+lying in a straight line. Once jumped, the singular disk or the sequence of 
+disks that was jumped over, will be flipped. If a player attempts an invalid move, 
+a modal will signal the player to try again.
+
+Winning 
+
+A user wins when the game board contains the disk pieces that are mostly of 
+their assigned color and there are no more possible moves left for the opponent 
+to continue the game. At game end, a modal will signal the winning player and 
+provide the option to start a new game. 
+
+
