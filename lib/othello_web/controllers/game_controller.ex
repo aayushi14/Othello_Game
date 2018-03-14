@@ -3,31 +3,33 @@ defmodule OthelloWeb.GameController do
   alias Othello.Game
 
 
-  # def show(conn, %{"name" => name}) do
-  #   user = get_session(conn, :user)
-  #   game = Game.load(name)
+  def show(conn, %{"gname" => name}) do
+    user = get_session(conn, :user)
+    game = Game.load(name)
+    IO.puts("*-*-*-GAME-*-*-*")
+    IO.inspect game
+    state = game[:state]
 
-  #   #state = game[:state]
+    host = (user == game[:host])
 
-  #   host = (user == game[:host])
+    if !is_nil(user) and !is_nil(game) do
+      IO.puts("*-*-*-STATE-*-*-*") 
+      IO.inspect state
+      render conn, "show.html", user: user, host: host, game: name, state: state
 
-  #   if !is_nil(user) and !is_nil(game) do
-  #     render conn, "show.html", user: user, host: host, game: name
-  #   else
-  #     conn
-  #     |> put_flash(:error, "Bad user or game chosen")
-  #     |> redirect(to: "/")
+    else
+      conn
+      |> put_flash(:error, "Bad user or game chosen")
+      |> redirect(to: "/")
 
-  #   end
-  # end
-  def show(conn, params) do
-    render conn, "show.html", game: params["game"]
+    end
   end
 
 
   def join(conn, %{"join_data" => join}) do
+    IO.inspect join;
     game = Game.join(join["game"], join["user"])
-    IO.inspect conn
+    #IO.inspect conn
     conn
     |> put_session(:user, join["user"])
     |> redirect(to: "/game/" <> join["game"])

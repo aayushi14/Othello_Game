@@ -29,7 +29,8 @@
       }
 
       gotView(view) {
-        //this.setState(view.game);
+        console.log(view.game.state)
+        // this.setState(view.game.state);
         this.channel.push("othello", {"state": view.game.state})
           .receive("ok", (resp) => console.log("resp", resp))
       }
@@ -134,7 +135,7 @@
       }
 
       render() {
-          console.log(this.state);
+          //console.log(this.state);
           
       		let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
 

@@ -26,7 +26,7 @@ defmodule Othello.Game do
     if game do
       game
     else
-      game = %{ name: name, host: user }
+      game = %{ name: name, host: user, state: new() }
       save(name, game)
     end
 
@@ -46,7 +46,9 @@ defmodule Othello.Game do
       xNumbers: 2,
       oNumbers: 2,
       xWasNext: true,
-      xIsNext: true
+      xIsNext: true,
+      player1: "",
+      player2: "",
     }
   end
 

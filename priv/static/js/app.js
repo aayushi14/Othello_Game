@@ -31916,7 +31916,8 @@ var Othello = function (_React$Component) {
   _createClass(Othello, [{
     key: 'gotView',
     value: function gotView(view) {
-      //this.setState(view.game);
+      console.log(view.game.state);
+      // this.setState(view.game.state);
       this.channel.push("othello", { "state": view.game.state }).receive("ok", function (resp) {
         return console.log("resp", resp);
       });
@@ -32047,7 +32048,7 @@ var Othello = function (_React$Component) {
     value: function render() {
       var _this3 = this;
 
-      console.log(this.state);
+      //console.log(this.state);
 
       var winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
 
