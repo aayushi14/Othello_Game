@@ -31910,6 +31910,7 @@ var Othello = function (_React$Component) {
     _this.channel.join().receive("ok", _this.gotView.bind(_this)).receive("error", function (resp) {
       console.log("Unable to join", resp);
     });
+    //this.channel.on("othello", state => );
     return _this;
   }
 
@@ -31917,10 +31918,10 @@ var Othello = function (_React$Component) {
     key: 'gotView',
     value: function gotView(view) {
       console.log(view.game.state);
-      // this.setState(view.game.state);
       this.channel.push("othello", { "state": view.game.state }).receive("ok", function (resp) {
         return console.log("resp", resp);
       });
+      this.setState(view.game.state);
     }
   }, {
     key: 'calculateWinner',
@@ -31995,6 +31996,10 @@ var Othello = function (_React$Component) {
     key: 'handleClick',
     value: function handleClick(i) {
       console.log(this.state);
+      this.channel.push("othello", { "state": this.state }).receive("ok", function (resp) {
+        return console.log("resp", resp);
+      });
+
       if (this.calculateWinner(this.state.xNumbers, this.state.oNumbers) || this.state.squares[i]) {
         return;
       }
@@ -32020,14 +32025,6 @@ var Othello = function (_React$Component) {
         oNumbers: oNumbers,
         xWasNext: shouldTurnColor,
         xIsNext: shouldTurnColor
-      });
-    }
-  }, {
-    key: 'jumpTo',
-    value: function jumpTo(step) {
-      this.setState({
-        stepNumber: parseInt(step, 0),
-        xIsNext: this.state.history[step].xWasNext
       });
     }
   }, {

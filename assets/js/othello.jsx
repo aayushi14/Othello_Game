@@ -26,13 +26,14 @@
         this.channel.join()
           .receive("ok", this.gotView.bind(this))
           .receive("error", resp => { console.log("Unable to join", resp) });
+        //this.channel.on("othello", state => );
       }
 
       gotView(view) {
         console.log(view.game.state)
-        // this.setState(view.game.state);
         this.channel.push("othello", {"state": view.game.state})
           .receive("ok", (resp) => console.log("resp", resp))
+        this.setState(view.game.state);
       }
 
       calculateWinner(xNumbers, oNumbers) {
@@ -91,6 +92,9 @@
 
       handleClick(i) {
         console.log(this.state);
+        this.channel.push("othello", {"state": this.state})
+          .receive("ok", (resp) => console.log("resp", resp))
+          
         if (this.calculateWinner(this.state.xNumbers, this.state.oNumbers) || this.state.squares[i]) {
           return;
         }
@@ -112,13 +116,6 @@
             oNumbers: oNumbers,
             xWasNext: shouldTurnColor,
             xIsNext: shouldTurnColor
-        });
-      }
-
-      jumpTo(step) {
-        this.setState({
-          stepNumber: parseInt(step, 0),
-          xIsNext: this.state.history[step].xWasNext
         });
       }
 

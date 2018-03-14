@@ -36,7 +36,8 @@ defmodule OthelloWeb.GamesChannel do
     game =  %{ name: name, host: user, state: state }
     Game.save(socket.assigns[:name], game)
     #socket = assign(socket, :game, game)
-    {:reply, {:ok, %{}}, socket}
+    IO.inspect game
+    {:reply, {:ok, %{"game" => game}}, socket}
   end
 
   # Add authorization logic here as required.
