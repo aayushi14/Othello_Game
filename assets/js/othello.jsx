@@ -3,7 +3,7 @@
   import Board from './board.jsx';
 
   export default function game_init(root, channel) {
-    let xNumbers: 2, oNumbers: 2, xWasNext: true;
+    // xNumbers: 2, oNumbers: 2, xWasNext: true;
     ReactDOM.render(<Othello channel={channel} />, root);
   }
 
@@ -91,21 +91,26 @@
     handleClick(i) {
       //const history = this.state.history.slice(0, this.state.stepNumber + 1);
       //const current = history[this.state.stepNumber];
+      const squares = this.state.squares;
+      let xNumbers = this.state.xNumbers;
+      let oNumbers = this.state.oNumbers;
+      const xWasNext = this.state.xWasNext;
+      let xIsNext = this.state.xIsNext;
 
       if (this.calculateWinner(xNumbers, oNumbers) || squares[i]) {
         return;
       }
 
-      const changedSquares = this.flipSquares(squares, i, this.state.xIsNext);
+      const changedSquares = this.flipSquares(squares, i, xIsNext);
 
       if (changedSquares === null) {
         return;
       }
 
-      const xNumbers = changedSquares.reduce((acc, current) => { return current === 'X' ? acc + 1 : acc }, 0);
-      const oNumbers = changedSquares.reduce((acc, current) => { return current === 'O' ? acc + 1 : acc }, 0);
+      xNumbers = changedSquares.reduce((acc, current) => { return current === 'X' ? acc + 1 : acc }, 0);
+      oNumbers = changedSquares.reduce((acc, current) => { return current === 'O' ? acc + 1 : acc }, 0);
 
-      let shouldTurnColor = this.checkAvailableMoves(!this.state.xIsNext, changedSquares).length > 0 ? !this.state.xIsNext : this.state.xIsNext
+      let shouldTurnColor = this.checkAvailableMoves(!this.state.xIsNext, changedSquares).length > 0 ? !xIsNext : xIsNext
 
       this.setState({
         squares: changedSquares,
@@ -126,8 +131,13 @@
       .receive("ok", this.gotView.bind(this));
     }
 
+    componentWillMount() {
+      this.channel.push("doLocal")
+      .receive("ok", this.gotView.bind(this));
+    }
+
     render() {
-      {this.local()}
+      //{this.local()}
     	return (
     		<div className="game">
           <div className="game-left-side">

@@ -31768,7 +31768,7 @@ var Board = function (_Component) {
 			return _react2.default.createElement(_square2.default, {
 				key: i,
 				isAvailable: this.props.availableMoves.indexOf(i) > -1,
-				value: this.props[i],
+				value: this.props.squares[i],
 				onClick: function onClick() {
 					return _this2.props.onClick(i);
 				} });
@@ -31836,9 +31836,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function game_init(root, channel) {
-  var xNumbers = void 0,
-      oNumbers = void 0,
-      xWasNext = void 0;
+  // xNumbers: 2, oNumbers: 2, xWasNext: true;
   _reactDom2.default.render(_react2.default.createElement(Othello, { channel: channel }), root);
 }
 
@@ -31955,25 +31953,30 @@ var Othello = function (_React$Component) {
     value: function handleClick(i) {
       //const history = this.state.history.slice(0, this.state.stepNumber + 1);
       //const current = history[this.state.stepNumber];
+      var squares = this.state.squares;
+      var xNumbers = this.state.xNumbers;
+      var oNumbers = this.state.oNumbers;
+      var xWasNext = this.state.xWasNext;
+      var xIsNext = this.state.xIsNext;
 
       if (this.calculateWinner(xNumbers, oNumbers) || squares[i]) {
         return;
       }
 
-      var changedSquares = this.flipSquares(squares, i, this.state.xIsNext);
+      var changedSquares = this.flipSquares(squares, i, xIsNext);
 
       if (changedSquares === null) {
         return;
       }
 
-      var xNumbers = changedSquares.reduce(function (acc, current) {
+      xNumbers = changedSquares.reduce(function (acc, current) {
         return current === 'X' ? acc + 1 : acc;
       }, 0);
-      var oNumbers = changedSquares.reduce(function (acc, current) {
+      oNumbers = changedSquares.reduce(function (acc, current) {
         return current === 'O' ? acc + 1 : acc;
       }, 0);
 
-      var shouldTurnColor = this.checkAvailableMoves(!this.state.xIsNext, changedSquares).length > 0 ? !this.state.xIsNext : this.state.xIsNext;
+      var shouldTurnColor = this.checkAvailableMoves(!this.state.xIsNext, changedSquares).length > 0 ? !xIsNext : xIsNext;
 
       this.setState({
         squares: changedSquares,
@@ -31994,13 +31997,16 @@ var Othello = function (_React$Component) {
       this.channel.push("doLocal").receive("ok", this.gotView.bind(this));
     }
   }, {
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      this.channel.push("doLocal").receive("ok", this.gotView.bind(this));
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _this3 = this;
 
-      {
-        this.local();
-      }
+      //{this.local()}
       return _react2.default.createElement(
         'div',
         { className: 'game' },
