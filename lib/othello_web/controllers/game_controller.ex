@@ -5,7 +5,7 @@ defmodule OthelloWeb.GameController do
 
   def show(conn, %{"gname" => name}) do
     user = get_session(conn, :user)
-    game = Game.load(name)
+    game = Othello.Game.load(name)
     state = game[:state]
 
     host = (user == game[:host])
@@ -24,7 +24,7 @@ defmodule OthelloWeb.GameController do
 
   def join(conn, %{"join_data" => join}) do
     IO.inspect join;
-    game = Game.join(join["game"], join["user"])
+    game = Othello.Game.join(join["game"], join["user"])
     #IO.inspect conn
     conn
     |> put_session(:user, join["user"])

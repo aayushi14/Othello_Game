@@ -43,14 +43,16 @@ class Othello extends React.Component {
     let modifiedBoard = null;
     // Calculate row and col of the starting position
     let [startX, startY] = [position % 8, (position - position % 8) / 8];
-
+    console.log("startX:" + startX + "startY:" + startY)
     if (squares[position] !== null) {
       return null;
     }
-
+    console.log("Squares:" + squares);
+    console.log("sp:" + squares[position]);
     // Iterate all directions, these numbers are the offsets in the array to reach next square
     [1, 7, 8, 9, -1, -7, -8, -9].forEach((offset) => {
     let flippedSquares = modifiedBoard ? modifiedBoard.slice() : squares.slice();
+    console.log("flippedSquares:" + flippedSquares);
     let atleastOneMarkIsFlipped = false;
     let [lastXpos, lastYPos] = [startX, startY];
 
@@ -58,12 +60,15 @@ class Othello extends React.Component {
 
         // Calculate the row and col of the current square
         let [xPos, yPos] = [y % 8, (y - y % 8) / 8];
-
+        console.log("X:" + xPos + "Y:" + yPos);
         // Fix when board is breaking into a new row or col
         if (Math.abs(lastXpos - xPos) > 1 || Math.abs(lastYPos - yPos) > 1) {
           break;
         }
 
+        console.log("xIsNext: " + xIsNext);
+        console.log("flippedSquares[y]: " + flippedSquares[y]);
+        console.log("atleastOneMarkIsFlipped: " + atleastOneMarkIsFlipped);
         // Next square was occupied with the opposite color
         if (flippedSquares[y] === (!xIsNext ? 'X' : 'O')) {
           flippedSquares[y] = xIsNext ? 'X' : 'O';
@@ -80,10 +85,12 @@ class Othello extends React.Component {
       }
     });
 
+    console.log("modifiedBoard: " + modifiedBoard);
     return modifiedBoard;
   }
 
   checkAvailableMoves(color, squares) {
+    console.log(this.flipSquares(squares, 20, color));
     return this.state.squares
     .map((value, index) => { return this.flipSquares(squares, index, color) ? index : null; })
     .filter((item) => { return item !== null; });
@@ -116,13 +123,18 @@ class Othello extends React.Component {
     });
   }
 
-  resetGame() {
-    this.channel.push("doReset")
+  handleClick(id) {
+    this.channel.push("tohandleClick", {id: id})
     .receive("ok", this.gotView.bind(this));
   }
 
-  local() {
-    this.channel.push("doLocal")
+  insideRender(winner, availableMoves, availableMovesOpposite, status) {
+    this.channel.push("inRender", {winner: winner, availableMoves: availableMoves, availableMovesOpposite: availableMovesOpposite, status: status})
+    .receive("ok", this.gotView.bind(this));
+  }
+
+  resetGame() {
+    this.channel.push("toReset")
     .receive("ok", this.gotView.bind(this));
   }
 
@@ -132,26 +144,26 @@ class Othello extends React.Component {
   //}
 
   render() {
-    //{this.local()}
-    let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
-
-    let availableMoves = this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
-    let availableMovesOpposite = this.checkAvailableMoves(!this.state.xWasNext, this.state.squares);
-
-    if ((availableMoves.length === 0) && (availableMovesOpposite.length === 0)) {
-      winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
-    }
-
-    let status =
-      	winner ?
-      		(winner === 'XO') ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') :
-      		[this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', availableMoves.length, ' available moves.'].join('');
+    {this.insideRender(this.state.winner, this.state.availableMoves, this.state.availableMovesOpposite, this.state.status)}
+    // let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
+    //
+    // let availableMoves = this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+    // let availableMovesOpposite = this.checkAvailableMoves(!this.state.xWasNext, this.state.squares);
+    //
+    // if ((availableMoves.length === 0) && (availableMovesOpposite.length === 0)) {
+    //   winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
+    // }
+    //
+    // let status =
+    //   	winner ?
+    //   		(winner === 'XO') ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') :
+    //   		[this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', availableMoves.length, ' available moves.'].join('');
 
     return (
       <div className="game">
         <div className="game-left-side">
           <div className="game-board">
-            <Board squares={this.state.squares} availableMoves={availableMoves} onClick={(i) => this.handleClick(i)} />
+            <Board squares={this.state.squares} availableMoves={this.state.availableMoves} onClick={(i) => this.handleClick(i)} />
           </div>
           <div></div>
         </div>
@@ -159,51 +171,45 @@ class Othello extends React.Component {
           <div>Black markers: {this.state.xNumbers}</div>
           <div>White markers: {this.state.oNumbers}</div>
           <br />
-          <div className="game-status">{status}&nbsp;{this.state.winner ? <button onClick={() => this.resetGame()}>Play again</button> : ''}</div>
+          <div className="game-status">{this.state.status}&nbsp;{this.state.winner ? <button onClick={() => this.resetGame()}>Play again</button> : ''}</div>
         </div>
       </div>
     );
   }
 }
 
-/*
-resetState() {
-  this.channel.push("doReset")
-  .receive("ok", this.gotView.bind(this));
-}
 
-showTiles(id) {
-  this.channel.push("showTile", {opentile: id})
-  .receive("ok", this.gotView.bind(this));
-}
-
-differentTiles(queArray, opentile1, opentile2, disableClick) {
-  this.channel.push("diffTiles", {queArray: queArray, opentile1:16, opentile2:16, disableClick: false})
-  .receive("ok", this.gotView.bind(this));
-}
-
-componentDidUpdate() {
-  let queArray = this.state.queArray;
-  let opentile1 = this.state.opentile1;
-  let opentile2 = this.state.opentile2;
-  let disableClick = this.state.disableClick;
-
-  if (opentile1 != 16 && opentile2 != 16 && queArray[opentile1] != queArray[opentile2]) {
-    setTimeout(() => this.differentTiles(queArray, opentile1, opentile2, disableClick), 1000);
-  }
-}
-
-render() {
-  return (
-    {this.state.queArray.map((letter, i) => <button className="tile"
-    onClick={() => {this.showTiles(i)}} key={"letter" + i} id={i}
-    disabled={this.state.disableClick}>
-    <b>{letter}</b></button>)}
-    <p>Number of Clicks: {this.state.totalClicks}</p>
-    <p>Score: {this.state.score}/80</p>
-    <button className="button" onClick={() => {this.resetState();}}>Reset Game</button>
-    <button className="button" onClick={() => {this.resetState(); this.newGame();}}>New Game</button>
-  );
-}
-}
-*/
+// showTiles(id) {
+//   this.channel.push("showTile", {opentile: id})
+//   .receive("ok", this.gotView.bind(this));
+// }
+//
+// differentTiles(queArray, opentile1, opentile2, disableClick) {
+//   this.channel.push("diffTiles", {queArray: queArray, opentile1:16, opentile2:16, disableClick: false})
+//   .receive("ok", this.gotView.bind(this));
+// }
+//
+// componentDidUpdate() {
+//   let queArray = this.state.queArray;
+//   let opentile1 = this.state.opentile1;
+//   let opentile2 = this.state.opentile2;
+//   let disableClick = this.state.disableClick;
+//
+//   if (opentile1 != 16 && opentile2 != 16 && queArray[opentile1] != queArray[opentile2]) {
+//     setTimeout(() => this.differentTiles(queArray, opentile1, opentile2, disableClick), 1000);
+//   }
+// }
+//
+// render() {
+//   return (
+//     {this.state.queArray.map((letter, i) => <button className="tile"
+//     onClick={() => {this.showTiles(i)}} key={"letter" + i} id={i}
+//     disabled={this.state.disableClick}>
+//     <b>{letter}</b></button>)}
+//     <p>Number of Clicks: {this.state.totalClicks}</p>
+//     <p>Score: {this.state.score}/80</p>
+//     <button className="button" onClick={() => {this.resetState();}}>Reset Game</button>
+//     <button className="button" onClick={() => {this.resetState(); this.newGame();}}>New Game</button>
+//   );
+// }
+// }

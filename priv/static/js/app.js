@@ -31933,14 +31933,16 @@ var Othello = function (_React$Component) {
       var startX = position % 8,
           startY = (position - position % 8) / 8;
 
-
+      console.log("startX:" + startX + "startY:" + startY);
       if (squares[position] !== null) {
         return null;
       }
-
+      console.log("Squares:" + squares);
+      console.log("sp:" + squares[position]);
       // Iterate all directions, these numbers are the offsets in the array to reach next square
       [1, 7, 8, 9, -1, -7, -8, -9].forEach(function (offset) {
         var flippedSquares = modifiedBoard ? modifiedBoard.slice() : squares.slice();
+        console.log("flippedSquares:" + flippedSquares);
         var atleastOneMarkIsFlipped = false;
         var lastXpos = startX,
             lastYPos = startY;
@@ -31952,12 +31954,15 @@ var Othello = function (_React$Component) {
           var xPos = y % 8,
               yPos = (y - y % 8) / 8;
 
+          console.log("X:" + xPos + "Y:" + yPos);
           // Fix when board is breaking into a new row or col
-
           if (Math.abs(lastXpos - xPos) > 1 || Math.abs(lastYPos - yPos) > 1) {
             break;
           }
 
+          console.log("xIsNext: " + xIsNext);
+          console.log("flippedSquares[y]: " + flippedSquares[y]);
+          console.log("atleastOneMarkIsFlipped: " + atleastOneMarkIsFlipped);
           // Next square was occupied with the opposite color
           if (flippedSquares[y] === (!xIsNext ? 'X' : 'O')) {
             flippedSquares[y] = xIsNext ? 'X' : 'O';
@@ -31976,6 +31981,7 @@ var Othello = function (_React$Component) {
         }
       });
 
+      console.log("modifiedBoard: " + modifiedBoard);
       return modifiedBoard;
     }
   }, {
@@ -31983,6 +31989,7 @@ var Othello = function (_React$Component) {
     value: function checkAvailableMoves(color, squares) {
       var _this2 = this;
 
+      console.log(this.flipSquares(squares, 20, color));
       return this.state.squares.map(function (value, index) {
         return _this2.flipSquares(squares, index, color) ? index : null;
       }).filter(function (item) {
@@ -32022,14 +32029,19 @@ var Othello = function (_React$Component) {
       });
     }
   }, {
-    key: 'resetGame',
-    value: function resetGame() {
-      this.channel.push("doReset").receive("ok", this.gotView.bind(this));
+    key: 'handleClick',
+    value: function handleClick(id) {
+      this.channel.push("tohandleClick", { id: id }).receive("ok", this.gotView.bind(this));
     }
   }, {
-    key: 'local',
-    value: function local() {
-      this.channel.push("doLocal").receive("ok", this.gotView.bind(this));
+    key: 'insideRender',
+    value: function insideRender(winner, availableMoves, availableMovesOpposite, status) {
+      this.channel.push("inRender", { winner: winner, availableMoves: availableMoves, availableMovesOpposite: availableMovesOpposite, status: status }).receive("ok", this.gotView.bind(this));
+    }
+  }, {
+    key: 'resetGame',
+    value: function resetGame() {
+      this.channel.push("toReset").receive("ok", this.gotView.bind(this));
     }
 
     //componentWillMount() {
@@ -32042,17 +32054,22 @@ var Othello = function (_React$Component) {
     value: function render() {
       var _this3 = this;
 
-      //{this.local()}
-      var winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
-
-      var availableMoves = this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
-      var availableMovesOpposite = this.checkAvailableMoves(!this.state.xWasNext, this.state.squares);
-
-      if (availableMoves.length === 0 && availableMovesOpposite.length === 0) {
-        winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
+      {
+        this.insideRender(this.state.winner, this.state.availableMoves, this.state.availableMovesOpposite, this.state.status);
       }
-
-      var status = winner ? winner === 'XO' ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') : [this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', availableMoves.length, ' available moves.'].join('');
+      // let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
+      //
+      // let availableMoves = this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+      // let availableMovesOpposite = this.checkAvailableMoves(!this.state.xWasNext, this.state.squares);
+      //
+      // if ((availableMoves.length === 0) && (availableMovesOpposite.length === 0)) {
+      //   winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
+      // }
+      //
+      // let status =
+      //   	winner ?
+      //   		(winner === 'XO') ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') :
+      //   		[this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', availableMoves.length, ' available moves.'].join('');
 
       return _react2.default.createElement(
         'div',
@@ -32063,7 +32080,7 @@ var Othello = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'game-board' },
-            _react2.default.createElement(_board2.default, { squares: this.state.squares, availableMoves: availableMoves, onClick: function onClick(i) {
+            _react2.default.createElement(_board2.default, { squares: this.state.squares, availableMoves: this.state.availableMoves, onClick: function onClick(i) {
                 return _this3.handleClick(i);
               } })
           ),
@@ -32088,7 +32105,7 @@ var Othello = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'game-status' },
-            status,
+            this.state.status,
             '\xA0',
             this.state.winner ? _react2.default.createElement(
               'button',
@@ -32106,47 +32123,40 @@ var Othello = function (_React$Component) {
   return Othello;
 }(_react2.default.Component);
 
-/*
-resetState() {
-  this.channel.push("doReset")
-  .receive("ok", this.gotView.bind(this));
-}
-
-showTiles(id) {
-  this.channel.push("showTile", {opentile: id})
-  .receive("ok", this.gotView.bind(this));
-}
-
-differentTiles(queArray, opentile1, opentile2, disableClick) {
-  this.channel.push("diffTiles", {queArray: queArray, opentile1:16, opentile2:16, disableClick: false})
-  .receive("ok", this.gotView.bind(this));
-}
-
-componentDidUpdate() {
-  let queArray = this.state.queArray;
-  let opentile1 = this.state.opentile1;
-  let opentile2 = this.state.opentile2;
-  let disableClick = this.state.disableClick;
-
-  if (opentile1 != 16 && opentile2 != 16 && queArray[opentile1] != queArray[opentile2]) {
-    setTimeout(() => this.differentTiles(queArray, opentile1, opentile2, disableClick), 1000);
-  }
-}
-
-render() {
-  return (
-    {this.state.queArray.map((letter, i) => <button className="tile"
-    onClick={() => {this.showTiles(i)}} key={"letter" + i} id={i}
-    disabled={this.state.disableClick}>
-    <b>{letter}</b></button>)}
-    <p>Number of Clicks: {this.state.totalClicks}</p>
-    <p>Score: {this.state.score}/80</p>
-    <button className="button" onClick={() => {this.resetState();}}>Reset Game</button>
-    <button className="button" onClick={() => {this.resetState(); this.newGame();}}>New Game</button>
-  );
-}
-}
-*/
+// showTiles(id) {
+//   this.channel.push("showTile", {opentile: id})
+//   .receive("ok", this.gotView.bind(this));
+// }
+//
+// differentTiles(queArray, opentile1, opentile2, disableClick) {
+//   this.channel.push("diffTiles", {queArray: queArray, opentile1:16, opentile2:16, disableClick: false})
+//   .receive("ok", this.gotView.bind(this));
+// }
+//
+// componentDidUpdate() {
+//   let queArray = this.state.queArray;
+//   let opentile1 = this.state.opentile1;
+//   let opentile2 = this.state.opentile2;
+//   let disableClick = this.state.disableClick;
+//
+//   if (opentile1 != 16 && opentile2 != 16 && queArray[opentile1] != queArray[opentile2]) {
+//     setTimeout(() => this.differentTiles(queArray, opentile1, opentile2, disableClick), 1000);
+//   }
+// }
+//
+// render() {
+//   return (
+//     {this.state.queArray.map((letter, i) => <button className="tile"
+//     onClick={() => {this.showTiles(i)}} key={"letter" + i} id={i}
+//     disabled={this.state.disableClick}>
+//     <b>{letter}</b></button>)}
+//     <p>Number of Clicks: {this.state.totalClicks}</p>
+//     <p>Score: {this.state.score}/80</p>
+//     <button className="button" onClick={() => {this.resetState();}}>Reset Game</button>
+//     <button className="button" onClick={() => {this.resetState(); this.newGame();}}>New Game</button>
+//   );
+// }
+// }
 
 });
 

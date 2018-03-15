@@ -23,33 +23,34 @@ defmodule OthelloWeb.GamesChannel do
     user  = socket.assigns[:user]
     #game = Game.load(name)
     game =  %{ name: name, host: user, state: state }
-    Game.save(socket.assigns[:name], game)
+    Othello.Game.save(socket.assigns[:name], game)
 
     broadcast socket, "othello", %{"game" => game}
     {:reply, {:ok, %{}}, socket}
     #{:reply, {:ok, %{"game" => game}}, socket}
   end
 
-  def handle_in("doReset", %{}, socket) do
+  def handle_in("tohandleClick", %{"id" => id}, socket) do
+    game = Game.showTile(socket.assigns[:game], id)
+    socket = assign(socket, :game, game)
+    Othello.GameBackup.save(socket.assigns[:name], game)
+    {:reply, {:ok, %{"game" => game}}, socket}
+  end
+
+  def handle_in("inRender", %{"winner" => winner, "availableMoves" => availableMoves, "availableMovesOpposite" => availableMovesOpposite, "status" => status}, socket) do
+    game = Game.inRender(socket.assigns[:game], winner, availableMoves, availableMovesOpposite, status)
+    socket = assign(socket, :game, game)
+    Othello.GameBackup.save(socket.assigns[:name], game)
+    {:reply, {:ok, %{"game" => game}}, socket}
+  end
+
+  def handle_in("toReset", %{}, socket) do
     game = Game.new()
     socket = assign(socket, :game, game)
     Othello.Game.save(socket.assigns[:name], game)
     {:reply, {:ok, %{"game" => game}}, socket}
   end
 
-  def handle_in("doLocal", %{}, socket) do
-    game = Game.doReset(socket.assigns[:game])
-    socket = assign(socket, :game, game)
-    Othello.GameBackup.save(socket.assigns[:name], game)
-    {:reply, {:ok, %{"game" => game}}, socket}
-  end
-
-  def handle_in("showTile", %{"opentile" => id}, socket) do
-    game = Game.showTile(socket.assigns[:game], id)
-    Othello.GameBackup.save(socket.assigns[:name], game)
-    socket = assign(socket, :game, game)
-    {:reply, {:ok, %{"game" => game}}, socket}
-  end
 
   def handle_in("diffTiles", %{"queArray" => queArray, "opentile1" => opentile1, "opentile2" => opentile2, "disableClick" => boole}, socket) do
     game = Game.diffTiles(socket.assigns[:game], queArray, opentile1, opentile2, boole)
