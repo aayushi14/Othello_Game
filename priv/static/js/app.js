@@ -32035,8 +32035,8 @@ var Othello = function (_React$Component) {
     }
   }, {
     key: 'insideRender',
-    value: function insideRender(winner, availableMoves, availableMovesOpposite, status) {
-      this.channel.push("inRender", { winner: winner, availableMoves: availableMoves, availableMovesOpposite: availableMovesOpposite, status: status }).receive("ok", this.gotView.bind(this));
+    value: function insideRender() {
+      this.channel.push("inRender").receive("ok", this.gotView.bind(this));
     }
   }, {
     key: 'resetGame',
@@ -32055,7 +32055,7 @@ var Othello = function (_React$Component) {
       var _this3 = this;
 
       {
-        this.insideRender(this.state.winner, this.state.availableMoves, this.state.availableMovesOpposite, this.state.status);
+        this.insideRender();
       }
       // let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
       //
@@ -32123,44 +32123,9 @@ var Othello = function (_React$Component) {
   return Othello;
 }(_react2.default.Component);
 
-// showTiles(id) {
-//   this.channel.push("showTile", {opentile: id})
-//   .receive("ok", this.gotView.bind(this));
-// }
-//
-// differentTiles(queArray, opentile1, opentile2, disableClick) {
-//   this.channel.push("diffTiles", {queArray: queArray, opentile1:16, opentile2:16, disableClick: false})
-//   .receive("ok", this.gotView.bind(this));
-// }
-//
-// componentDidUpdate() {
-//   let queArray = this.state.queArray;
-//   let opentile1 = this.state.opentile1;
-//   let opentile2 = this.state.opentile2;
-//   let disableClick = this.state.disableClick;
-//
-//   if (opentile1 != 16 && opentile2 != 16 && queArray[opentile1] != queArray[opentile2]) {
-//     setTimeout(() => this.differentTiles(queArray, opentile1, opentile2, disableClick), 1000);
-//   }
-// }
-//
-// render() {
-//   return (
-//     {this.state.queArray.map((letter, i) => <button className="tile"
-//     onClick={() => {this.showTiles(i)}} key={"letter" + i} id={i}
-//     disabled={this.state.disableClick}>
-//     <b>{letter}</b></button>)}
-//     <p>Number of Clicks: {this.state.totalClicks}</p>
-//     <p>Score: {this.state.score}/80</p>
-//     <button className="button" onClick={() => {this.resetState();}}>Reset Game</button>
-//     <button className="button" onClick={() => {this.resetState(); this.newGame();}}>New Game</button>
-//   );
-// }
-// }
-
 });
 
-;require.register("js/socket.js", function(exports, require, module) {
+require.register("js/socket.js", function(exports, require, module) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

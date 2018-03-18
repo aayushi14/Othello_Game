@@ -17,4 +17,14 @@ defmodule Othello.GameBackup do
     end
   end
 
+  def join(name, user) do
+    game = load(name)
+    if game do
+      game
+    else
+      game = %{ name: name, host: user, state: Othello.Game.new() }
+      save(name, game)
+    end
+  end
+
 end

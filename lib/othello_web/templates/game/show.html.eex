@@ -10,7 +10,7 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-10">
-     
+
       <%# Game display target %>
       <div id="root">
         <p>React app not loaded...</p>
@@ -29,3 +29,11 @@
     </div>
 
 </div>
+
+<script>
+window.othello_cfg = {
+  user: “<%= escape_javascript @user %>“,
+  game: “<%= escape_javascript @game %>“,
+  host: <%= @host %>,
+};
+</script>
