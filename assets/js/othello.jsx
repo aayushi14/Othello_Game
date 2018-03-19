@@ -124,6 +124,7 @@ class Othello extends React.Component {
   }
 
   handleClick(id) {
+    console.log("Inside handleClick");
     this.channel.push("tohandleClick", {id: id})
     .receive("ok", this.gotView.bind(this));
   }
@@ -138,13 +139,18 @@ class Othello extends React.Component {
     .receive("ok", this.gotView.bind(this));
   }
 
-  //componentWillMount() {
-  //  this.channel.push("doLocal")
-  //  .receive("ok", this.gotView.bind(this));
-  //}
+  calculateWinner(xNumbers, oNumbers) {
+    this.channel.push("tocalculateWinner", {xNumbers: xNumbers, oNumbers: oNumbers})
+    .receive("ok", this.gotView.bind(this));
+  }
+
+  checkAvailableMoves(xWasNext, squares) {
+    this.channel.push("tocheckAvailableMoves", {xWasNext: xWasNext, squares: squares})
+    .receive("ok", this.gotView.bind(this));
+  }
 
   render() {
-    {this.insideRender()}
+    //{this.insideRender()}
     // let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
     //
     // let availableMoves = this.checkAvailableMoves(this.state.xWasNext, this.state.squares);

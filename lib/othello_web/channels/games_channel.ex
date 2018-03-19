@@ -39,7 +39,7 @@ defmodule OthelloWeb.GamesChannel do
     user  = socket.assigns[:user]
     #game = Game.load(name)
     game =  %{ name: name, host: user, state: state }
-    Othello.GameBackup.save(socket.assigns[:name], game)
+    Othello.Game.save(socket.assigns[:name], game)
 
     broadcast socket, "othello", %{"game" => game}
     {:reply, {:ok, %{}}, socket}
@@ -48,24 +48,29 @@ defmodule OthelloWeb.GamesChannel do
 
   def handle_in("tohandleClick", %{"id" => id}, socket) do
     game = Game.tohandleClick(socket.assigns[:game], id)
-    IO.puts "game"
-    IO.inspect(game)
     socket = assign(socket, :game, game)
-    Othello.GameBackup.save(socket.assigns[:name], game)
+    Othello.Game.save(socket.assigns[:name], game)
     {:reply, {:ok, %{"game" => game}}, socket}
   end
 
-  def handle_in("inRender", %{}, socket) do
-    game = Game.inRender(socket.assigns[:game])
+  def handle_in("tocalculateWinner", %{"xNumbers" => xNumbers, "oNumbers" => oNumbers}, socket) do
+    game = Game.inRender(socket.assigns[:game], xNumbers, oNumbers)
     socket = assign(socket, :game, game)
-    Othello.GameBackup.save(socket.assigns[:name], game)
+    Othello.Game.save(socket.assigns[:name], game)
+    {:reply, {:ok, %{"game" => game}}, socket}
+  end
+
+  def handle_in("tocheckAvailableMoves", %{"xWasNext" => xWasNext, "squares" => squares}, socket) do
+    game = Game.inRender(socket.assigns[:game], xWasNext, squares)
+    socket = assign(socket, :game, game)
+    Othello.Game.save(socket.assigns[:name], game)
     {:reply, {:ok, %{"game" => game}}, socket}
   end
 
   def handle_in("toReset", %{}, socket) do
     game = Game.new()
     socket = assign(socket, :game, game)
-    Othello.GameBackup.save(socket.assigns[:name], game)
+    Othello.Game.save(socket.assigns[:name], game)
     {:reply, {:ok, %{"game" => game}}, socket}
   end
 
