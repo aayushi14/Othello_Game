@@ -1,0 +1,24 @@
+<nav role="navigation">
+  <ul class="nav nav-pills pull-right">
+    <li><a href="/">Go Back</a></li>
+  </ul>
+</nav>
+<h1>Othello Game</h1>
+<script>
+  window.gameName = "<%= @game %>";
+  window.user = "<%= @user %>"
+</script>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-10">
+
+      <%# Game display target %>
+      <div id="root">
+        <p>React app not loaded...</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+

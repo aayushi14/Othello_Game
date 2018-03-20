@@ -9,8 +9,6 @@
                         'Elixir.OthelloWeb','Elixir.OthelloWeb.Endpoint',
                         'Elixir.OthelloWeb.ErrorHelpers',
                         'Elixir.OthelloWeb.ErrorView',
-                        'Elixir.OthelloWeb.GameController',
-                        'Elixir.OthelloWeb.GameView',
                         'Elixir.OthelloWeb.GamesChannel',
                         'Elixir.OthelloWeb.Gettext',
                         'Elixir.OthelloWeb.LayoutView',

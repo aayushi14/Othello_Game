@@ -1,42 +1,42 @@
 defmodule Othello.Game do
 
-  use Agent
+  # use Agent
 
-  def start_link do
-    Agent.start_link(fn -> %{} end, name: __MODULE__)
-  end
+  # def start_link do
+  #   Agent.start_link(fn -> %{} end, name: __MODULE__)
+  # end
 
-  def save(name, game) do
-    Agent.update __MODULE__, fn state ->
-      Map.put(state, name, game)
-    end
-  end
+  # def save(gname, game) do
+  #   Agent.update __MODULE__, fn state ->
+  #     Map.put(state, gname, game)
+  #   end
+  # end
 
-  def load(name) do
-    Agent.get __MODULE__, fn state ->
-      Map.get(state, name)
-    end
-  end
+  # def load(gname) do
+  #   Agent.get __MODULE__, fn state ->
+  #     Map.get(state, gname)
+  #   end
+  # end
 
-  def join(name, user) do
-    game = load(name)
-    if game do
-      game
-    else
-      game = %{ name: name, host: user, state: new() }
-      save(name, game)
-    end
-  end
+  # def join(game, user) do
+  #   game = load(gname)
+  #   if game do
+  #     game
+  #   else
+  #     game = %{ gname: gname, host: user, state: new() }
+  #     save(gname, game)
+  #   end
+  # end
 
   @board_squares 0..63
 
   defp initSq do
     initSquares = Enum.map(@board_squares, fn(x) -> nil end)
     initSquares = initSquares
-                  |> List.insert_at(27, 'X')
-                  |> List.insert_at(28, 'O')
-                  |> List.insert_at(35, 'O')
-                  |> List.insert_at(36, 'X')
+                  |> List.insert_at(27, "X")
+                  |> List.insert_at(28, "O")
+                  |> List.insert_at(35, "O")
+                  |> List.insert_at(36, "X")
     initSquares
   end
 
@@ -50,7 +50,7 @@ defmodule Othello.Game do
       xIsNext: true,
       availableMoves: [20, 29, 34, 43],
       availableMovesOpposite: [19, 26, 37, 44],
-      player1: "",
+      player1: "arcy",
       player2: "",
     }
   end
@@ -288,12 +288,12 @@ defmodule Othello.Game do
 
   def tohandleClick(game, id) do
     IO.puts "INSIDE---------------------tohandleClick"
-    IO.inspect(game.state.squares)
-    squares = game.state.squares
-    xNumbers = game.state.xNumbers
-    oNumbers = game.state.oNumbers
-    xWasNext = game.state.xWasNext
-    xIsNext = game.state.xIsNext
+    IO.inspect(game.squares)
+    squares = game.state.state.squares
+    xNumbers = game.state.state.xNumbers
+    oNumbers = game.state.state.oNumbers
+    xWasNext = game.state.state.xWasNext
+    xIsNext = game.state.state.xIsNext
 
     if calculateWinner(xNumbers, oNumbers) || Enum.at(squares,id) do
       IO.puts "tohandleClick calculateWinner"
@@ -313,7 +313,7 @@ defmodule Othello.Game do
         IO.inspect shouldTurnColor
       end
     end
-    %{game.state | squares: changedSquares, xNumbers: xNumbers, oNumbers: oNumbers, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor}
+    %{game.state.state| squares: changedSquares, xNumbers: xNumbers, oNumbers: oNumbers, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor}
   end
 
   def tocheckAvailableMoves(game, color, squares) do
@@ -322,7 +322,7 @@ defmodule Othello.Game do
     availableMoves = getmodifiedIndex_loop(squares, 0, color, [])
     IO.puts "tocheckAvailableMoves availableMoves: "
     IO.inspect availableMoves
-    %{game.state | availableMoves: availableMoves}
+    %{game.state.state| availableMoves: availableMoves}
   end
 
   def tocheckAvailableMovesOpposite(game, color, squares) do
@@ -331,20 +331,20 @@ defmodule Othello.Game do
     availableMovesOpposite = getmodifiedIndex_loop(squares, 0, color, [])
     IO.puts "tocheckAvailableMovesOpposite availableMovesOpposite: "
     IO.inspect availableMovesOpposite
-    %{game.state | availableMovesOpposite: availableMovesOpposite}
+    %{game.state.state| availableMovesOpposite: availableMovesOpposite}
   end
 
 
   # def inRender(game) do
   #   IO.puts "inRender game-----------"
   #   IO.inspect(game)
-  #   squares = game.state.squares
-  #   xNumbers = game.state.xNumbers
-  #   oNumbers = game.state.oNumbers
-  #   xWasNext = game.state.xWasNext
-  #   xIsNext = game.state.xIsNext
-  #   availableMoves = game.state.availableMoves
-  #   availableMovesOpposite = game.state.availableMovesOpposite
+  #   squares = game.state.state.squares
+  #   xNumbers = game.state.state.xNumbers
+  #   oNumbers = game.state.state.oNumbers
+  #   xWasNext = game.state.state.xWasNext
+  #   xIsNext = game.state.state.xIsNext
+  #   availableMoves = game.state.state.availableMoves
+  #   availableMovesOpposite = game.state.state.availableMovesOpposite
   #
   #   initSquares = initSq()
   #   IO.puts "----inRender----"

@@ -116,6 +116,7 @@
 
 (function() {
 var global = typeof window === 'undefined' ? this : window;
+var process;
 var __makeRelativeRequire = function(require, mappings, pref) {
   var none = {};
   var tryReq = function(name, pref) {
@@ -31744,7 +31745,7 @@ function start() {
   var root = document.getElementById('root');
 
   if (root) {
-    var channel = _socket2.default.channel("game:" + window.gameName, {});
+    var channel = _socket2.default.channel("games:" + window.g_name, { "user": window.user });
     (0, _othello2.default)(root, channel);
   }
 } // Brunch automatically concatenates all files in your
@@ -31889,7 +31890,7 @@ var Othello = function (_React$Component) {
 
     _this.channel = props.channel;
     var initSquares = Array(64).fill(null);
-    var _ref = ['X', 'O', 'X', 'O'];
+    var _ref = ["X", "O", "X", "O"];
     initSquares[8 * 3 + 3] = _ref[0];
     initSquares[8 * 3 + 4] = _ref[1];
     initSquares[8 * 4 + 4] = _ref[2];
@@ -31907,6 +31908,17 @@ var Othello = function (_React$Component) {
       player1: "",
       player2: ""
     };
+
+    _this.channel.on("tocheckAvailableMoves", _this.checkAvailableMoves);
+    _this.channel.on("tocheckAvailableMovesOpposite", _this.checkAvailableMovesOpposite);
+
+    _this.channel.on("join", function (payload) {
+      var game_state = payload.game_state;
+      console.log("state after joining");
+      console.log(game_state);
+      _this.setState(game_state);
+    });
+
     _this.channel.join().receive("ok", _this.gotView.bind(_this)).receive("error", function (resp) {
       console.log("Unable to join", resp);
     });
@@ -31917,11 +31929,15 @@ var Othello = function (_React$Component) {
     key: 'gotView',
     value: function gotView(view) {
       this.setState(view.game);
+      console.log("gotView: ");
+      console.log(view.game);
+      console.log(view.game.state);
+      console.log(view.game.host);
     }
   }, {
     key: 'calculateWinner',
     value: function calculateWinner(xNumbers, oNumbers) {
-      return xNumbers + oNumbers < 64 ? null : xNumbers === oNumbers ? 'XO' : xNumbers > oNumbers ? 'X' : 'O';
+      return xNumbers + oNumbers < 64 ? null : xNumbers === oNumbers ? "XO" : xNumbers > oNumbers ? "X" : "O";
     }
 
     // flipSquares(squares, position, xIsNext) {
@@ -32014,21 +32030,10 @@ var Othello = function (_React$Component) {
       this.channel.push("tohandleClick", { id: id }).receive("ok", this.gotView.bind(this));
     }
   }, {
-    key: 'insideRender',
-    value: function insideRender() {
-      this.channel.push("inRender").receive("ok", this.gotView.bind(this));
-    }
-  }, {
     key: 'resetGame',
     value: function resetGame() {
       this.channel.push("toReset").receive("ok", this.gotView.bind(this));
     }
-
-    // calculateWinner(xNumbers, oNumbers) {
-    //   this.channel.push("tocalculateWinner", {xNumbers: xNumbers, oNumbers: oNumbers})
-    //   .receive("ok", this.gotView.bind(this));
-    // }
-
   }, {
     key: 'checkAvailableMoves',
     value: function checkAvailableMoves(xWasNext, squares) {
@@ -32047,35 +32052,19 @@ var Othello = function (_React$Component) {
       var winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
       console.log("winner: " + winner);
 
-      this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
-      console.log("availableMoves: " + this.state.availableMoves);
+      // this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+      // console.log("availableMoves: " + this.state.availableMoves);
 
-      this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
-      console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
+      // this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
+      // console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
 
       console.log("availableMoves.length: " + this.state.availableMoves.length);
       if (this.state.availableMoves.length === 0 && this.state.availableMovesOpposite.length === 0) {
-        winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
+        winner = this.state.xNumbers === this.state.oNumbers ? "XO" : this.state.xNumbers > this.state.oNumbers ? "X" : "O";
       }
 
-      var status = winner ? winner === 'XO' ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') : [this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
-
-      // let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
-      // console.log("winner: " + winner);
-      // let availableMoves = this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
-      // console.log("availableMoves: " + availableMoves);
-      // let availableMovesOpposite = this.checkAvailableMoves(!this.state.xWasNext, this.state.squares);
-      // console.log("availableMovesOpposite: " + availableMovesOpposite);
-      // console.log("availableMoves.length: " + availableMoves.length);
-      // if ((availableMoves.length === 0) && (availableMovesOpposite.length === 0)) {
-      //   winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
-      // }
-      //
-      // let status =
-      //   	winner ?
-      //   		(winner === 'XO') ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') :
-      //   		[this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', availableMoves.length, ' available moves.'].join('');
-
+      var status = winner ? winner === "XO" ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') : [this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
+      console.log(this.state);
       return _react2.default.createElement(
         'div',
         { className: 'game' },
@@ -32227,7 +32216,7 @@ function Square(props) {
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
 require.alias("process/browser.js", "process");
-require.alias("underscore/underscore.js", "underscore");require.register("___globals___", function(exports, require, module) {
+require.alias("underscore/underscore.js", "underscore");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 
 // Auto-loaded modules from config.npm.globals.

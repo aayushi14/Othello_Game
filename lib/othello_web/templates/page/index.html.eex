@@ -1,3 +1,21 @@
+<script>
+  function toJoin() {
+    let g_name = $("#g_name").val();
+    if (g_name === "") {
+      alert("Game name cannot be empty!");
+      return;
+    }
+
+    let user = $("#user").val();
+    if (user === "") {
+      alert("User name cannot be empty!");
+      return;
+    }
+
+    window.location.href = "/game/" + g_name + "?user=" + user;
+  }
+</script>
+
 <h1>Othello Game</h1>
 <div class="row">
   <div class="col">
@@ -5,20 +23,19 @@
     <p>Enter your name and the name of a game to join a game.</p>
     <p>To create a new game, pick an unused name and share it with the other players.</p>
 
-    <%# code from Draw Game %>
-  <%= form_for @conn, "/games/join", [as: :join_data], fn f -> %>
-    <div class="form-group">
-      <%= label(f, :user, "Your Name") %>
-      <%= text_input(f, :user, class: "form-control") %>
-    </div>
-    <div class="form-group">
-      <%= label(f, :game, "Game Name") %>
-      <%= text_input(f, :game, class: "form-control") %>
-    </div>
-    <%= submit "Join", class: "btn btn-primary" %>
-    <% end %>
+    <p>Enter your Name: <input id="user" type="text"/>
+    <p>Enter game name: <input id="g_name" type="text"></p>
+    <button id="game-button" onclick="toJoin()">Join Game</button></p>
+     <p id="game-output"></p>
+
   </div>
 </div>
+
+
+
+
+
+
 
 
 

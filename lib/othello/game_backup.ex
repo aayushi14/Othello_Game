@@ -17,14 +17,18 @@ defmodule Othello.GameBackup do
     end
   end
 
-  def join(name, user) do
-    game = load(name)
-    if game do
-      game
-    else
-      game = %{ name: name, host: user, state: Othello.Game.new() }
-      save(name, game)
-    end
-  end
+  #   # For lobby to get all game names
+  # def lobby do
+  #   Agent.get __MODULE__, fn state ->
+  #     Map.keys(state)
+  #   end
+  # end
+
+  # # Return the map of all game instances
+  # def instances do
+  #   Agent.get __MODULE__, fn state ->
+  #     state
+  #   end
+  # end
 
 end

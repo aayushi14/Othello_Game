@@ -11,7 +11,7 @@ class Othello extends React.Component {
     super(props);
     this.channel = props.channel;
     const initSquares = Array(64).fill(null);
-    [initSquares[8 * 3 + 3], initSquares[8 * 3 + 4], initSquares[8 * 4 + 4], initSquares[8 * 4 + 3]] = ['X', 'O', 'X', 'O'];
+    [initSquares[8 * 3 + 3], initSquares[8 * 3 + 4], initSquares[8 * 4 + 4], initSquares[8 * 4 + 3]] = ["X", "O", "X", "O"];
 
     this.state = {
       squares: initSquares,
@@ -24,17 +24,32 @@ class Othello extends React.Component {
       player1: "",
       player2: "",
     };
+
+    this.channel.on("tocheckAvailableMoves", this.checkAvailableMoves);
+    this.channel.on("tocheckAvailableMovesOpposite", this.checkAvailableMovesOpposite);
+
+    this.channel.on("join", payload => {
+      let game_state = payload.game_state;
+      console.log("state after joining");
+      console.log(game_state);
+      this.setState(game_state);
+    });
+
     this.channel.join()
-    .receive("ok", this.gotView.bind(this))
-    .receive("error", resp => { console.log("Unable to join", resp) });
+      .receive("ok", this.gotView.bind(this))
+      .receive("error", resp => { console.log("Unable to join", resp) });
   }
 
   gotView(view) {
     this.setState(view.game);
+    console.log("gotView: ");
+    console.log(view.game);
+    console.log(view.game.state);
+    console.log(view.game.host);
   }
 
   calculateWinner(xNumbers, oNumbers) {
-    return (xNumbers + oNumbers < 64) ? null : (xNumbers === oNumbers) ? 'XO' : (xNumbers > oNumbers ? 'X' : 'O');
+    return (xNumbers + oNumbers < 64) ? null : (xNumbers === oNumbers) ? "XO" : (xNumbers > oNumbers ? "X" : "O");
   }
 
   // flipSquares(squares, position, xIsNext) {
@@ -126,20 +141,11 @@ class Othello extends React.Component {
     .receive("ok", this.gotView.bind(this));
   }
 
-  insideRender() {
-    this.channel.push("inRender")
-    .receive("ok", this.gotView.bind(this));
-  }
 
   resetGame() {
     this.channel.push("toReset")
     .receive("ok", this.gotView.bind(this));
   }
-
-  // calculateWinner(xNumbers, oNumbers) {
-  //   this.channel.push("tocalculateWinner", {xNumbers: xNumbers, oNumbers: oNumbers})
-  //   .receive("ok", this.gotView.bind(this));
-  // }
 
   checkAvailableMoves(xWasNext, squares) {
     this.channel.push("tocheckAvailableMoves", {xWasNext: xWasNext, squares: squares})
@@ -155,39 +161,22 @@ class Othello extends React.Component {
     let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
     console.log("winner: " + winner);
 
-    this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
-    console.log("availableMoves: " + this.state.availableMoves);
+    // this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+    // console.log("availableMoves: " + this.state.availableMoves);
 
-    this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
-    console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
+    // this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
+    // console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
 
     console.log("availableMoves.length: " + this.state.availableMoves.length);
     if ((this.state.availableMoves.length === 0) && (this.state.availableMovesOpposite.length === 0)) {
-      winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
+      winner = this.state.xNumbers === this.state.oNumbers ? "XO" : this.state.xNumbers > this.state.oNumbers ? "X" : "O";
     }
 
     let status =
       	winner ?
-      		(winner === 'XO') ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') :
+      		(winner === "XO") ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') :
       		[this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
-
-
-    // let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
-    // console.log("winner: " + winner);
-    // let availableMoves = this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
-    // console.log("availableMoves: " + availableMoves);
-    // let availableMovesOpposite = this.checkAvailableMoves(!this.state.xWasNext, this.state.squares);
-    // console.log("availableMovesOpposite: " + availableMovesOpposite);
-    // console.log("availableMoves.length: " + availableMoves.length);
-    // if ((availableMoves.length === 0) && (availableMovesOpposite.length === 0)) {
-    //   winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
-    // }
-    //
-    // let status =
-    //   	winner ?
-    //   		(winner === 'XO') ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') :
-    //   		[this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', availableMoves.length, ' available moves.'].join('');
-
+    console.log(this.state);
     return (
       <div className="game">
         <div className="game-left-side">

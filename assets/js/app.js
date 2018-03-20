@@ -22,12 +22,11 @@ import socket from "./socket";
 import game_init from "./othello";
 
 
-
 function start() {
   let root = document.getElementById('root');
-
+  
   if(root) {
-    let channel = socket.channel("game:" + window.gameName, {});
+    let channel = socket.channel("games:" + window.g_name, {"user": window.user});
     game_init(root, channel);
   }
 
