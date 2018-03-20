@@ -40,7 +40,8 @@ defmodule OthelloWeb.GamesChannel do
 
   def handle_in("tohandleClick", %{"id" => id}, socket) do
     game = GameBackup.load(socket.assigns[:name])
-    game = Game.tohandleClick(socket.assigns[:game], id)
+    game = Game.tohandleClick(game, id)
+    IO.puts("handle_in game: ")
     IO.inspect game
 
     GameBackup.save(socket.assigns[:name], game)

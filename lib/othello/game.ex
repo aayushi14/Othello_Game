@@ -295,11 +295,11 @@ defmodule Othello.Game do
   def tohandleClick(game, id) do
     IO.puts "INSIDE---------------------tohandleClick"
     IO.inspect(game.squares)
-    squares = game.state.state.squares
-    xNumbers = game.state.state.xNumbers
-    oNumbers = game.state.state.oNumbers
-    xWasNext = game.state.state.xWasNext
-    xIsNext = game.state.state.xIsNext
+    squares = game.squares
+    xNumbers = game.xNumbers
+    oNumbers = game.oNumbers
+    xWasNext = game.xWasNext
+    xIsNext = game.xIsNext
 
     if calculateWinner(xNumbers, oNumbers) || Enum.at(squares,id) do
       IO.puts "tohandleClick calculateWinner"
@@ -319,7 +319,7 @@ defmodule Othello.Game do
         IO.inspect shouldTurnColor
       end
     end
-    %{game.state.state| squares: changedSquares, xNumbers: xNumbers, oNumbers: oNumbers, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor}
+    %{game | squares: changedSquares, xNumbers: xNumbers, oNumbers: oNumbers, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor}
   end
 
   def tocheckAvailableMoves(game, color, squares) do
@@ -328,7 +328,7 @@ defmodule Othello.Game do
     availableMoves = getmodifiedIndex_loop(squares, 0, color, [])
     IO.puts "tocheckAvailableMoves availableMoves: "
     IO.inspect availableMoves
-    %{game.state.state| availableMoves: availableMoves}
+    %{game | availableMoves: availableMoves}
   end
 
   def tocheckAvailableMovesOpposite(game, color, squares) do
@@ -337,20 +337,20 @@ defmodule Othello.Game do
     availableMovesOpposite = getmodifiedIndex_loop(squares, 0, color, [])
     IO.puts "tocheckAvailableMovesOpposite availableMovesOpposite: "
     IO.inspect availableMovesOpposite
-    %{game.state.state| availableMovesOpposite: availableMovesOpposite}
+    %{game | availableMovesOpposite: availableMovesOpposite}
   end
 
 
   # def inRender(game) do
   #   IO.puts "inRender game-----------"
   #   IO.inspect(game)
-  #   squares = game.state.state.squares
-  #   xNumbers = game.state.state.xNumbers
-  #   oNumbers = game.state.state.oNumbers
-  #   xWasNext = game.state.state.xWasNext
-  #   xIsNext = game.state.state.xIsNext
-  #   availableMoves = game.state.state.availableMoves
-  #   availableMovesOpposite = game.state.state.availableMovesOpposite
+  #   squares = game.squares
+  #   xNumbers = game.xNumbers
+  #   oNumbers = game.oNumbers
+  #   xWasNext = game.xWasNext
+  #   xIsNext = game.xIsNext
+  #   availableMoves = game.availableMoves
+  #   availableMovesOpposite = game.availableMovesOpposite
   #
   #   initSquares = initSq()
   #   IO.puts "----inRender----"
