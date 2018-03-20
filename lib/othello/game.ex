@@ -48,10 +48,8 @@ defmodule Othello.Game do
       oNumbers: 2,
       xWasNext: true,
       xIsNext: true,
-      winner: '',
       availableMoves: [20, 29, 34, 43],
       availableMovesOpposite: [19, 26, 37, 44],
-      status: '',
       player1: "",
       player2: "",
     }
@@ -65,10 +63,8 @@ defmodule Othello.Game do
       oNumbers: 2,
       xWasNext: true,
       xIsNext: true,
-      winner: '',
       availableMoves: [20, 29, 34, 43],
       availableMovesOpposite: [19, 26, 37, 44],
-      status: '',
       player1: "",
       player2: "",
     }
@@ -80,13 +76,11 @@ defmodule Othello.Game do
     oNumbers = game.oNumbers
     xWasNext = game.xWasNext
     xIsNext = game.xIsNext
-    winner = game.winner
     availableMoves = game.availableMoves
     availableMovesOpposite = game.availableMovesOpposite
-    status = game.status
 
     initSquares = initSq()
-    %{game | squares: initSquares, xNumbers: 2, oNumbers: 2, xWasNext: true, xIsNext: true, winner: nil, availableMoves: [20, 29, 34, 43], availableMovesOpposite: [19, 26, 37, 44], status: nil}
+    %{game | squares: initSquares, xNumbers: 2, oNumbers: 2, xWasNext: true, xIsNext: true, availableMoves: [20, 29, 34, 43], availableMovesOpposite: [19, 26, 37, 44]}
   end
 
   def calculateWinner(xNumbers, oNumbers) do
@@ -110,8 +104,8 @@ defmodule Othello.Game do
     IO.inspect modifiedBoard
     modifiedBoard
   end
-  defp infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when y >= 64, do: modifiedBoard
 
+  defp infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when y >= 64, do: modifiedBoard
   defp infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when y < 64 do
     IO.puts "INSIDE infor_loop: "
     # Calculate the row and col of the current square
@@ -212,32 +206,6 @@ defmodule Othello.Game do
   end
 
 
-    # def fetch_something
-    #   tries = 0
-    #   body = nil
-    #   loop do
-    #     status, body = make_external_http_call
-    #     break if status == 200
-    #     tries += 1
-    #     if tries >= 5
-    #       body = "Service not available"
-    #       break
-    #     end
-    #   end
-    #   body
-    # end
-
-    # def fetch_something(tries \\ 0)
-    # def fetch_something(tries) when tries < 5
-    #   case make_external_http_call do
-    #     {200, body} -> body
-    #     {_status, _body} -> fetch_something(tries + 1)
-    #   end
-    # end
-    # def fetch_something(tries) when tries >= 5 do
-    #   "Service not available"
-    # end
-
   def flipSquares(squares, position, xIsNext) do
     IO.puts "INSIDE flipSquares"
     modifiedBoard = nil
@@ -312,12 +280,10 @@ defmodule Othello.Game do
   def checkAvailableMoves(color, squares) do
     IO.puts "============INSIDE checkAvailableMoves============"
     IO.inspect(squares)
-    availableSquares = getmodifiedIndex_loop(squares, 0, color, [])
-    IO.puts "inside checkAvailableMoves-----------------availableSquares: "
-    IO.inspect availableSquares
-    # modifiedSquares = Enum.map(squares, fn(index) -> (if flipSquares(squares, index, color) !== nil, do: index, else: nil) end)
-    # availableSquares = Enum.filter(squares, fn(item) -> item !== nil end)
-    availableSquares
+    availableMoves = getmodifiedIndex_loop(squares, 0, color, [])
+    IO.puts "availableSquares: "
+    IO.inspect availableMoves
+    availableMoves
   end
 
   def tohandleClick(game, id) do
@@ -350,47 +316,65 @@ defmodule Othello.Game do
     %{game.state | squares: changedSquares, xNumbers: xNumbers, oNumbers: oNumbers, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor}
   end
 
-  def inRender(game) do
-    IO.puts "inRender game-----------"
-    IO.inspect(game)
-    squares = game.state.squares
-    xNumbers = game.state.xNumbers
-    oNumbers = game.state.oNumbers
-    xWasNext = game.state.xWasNext
-    xIsNext = game.state.xIsNext
-    winner = game.state.winner
-    availableMoves = game.state.availableMoves
-    availableMovesOpposite = game.state.availableMovesOpposite
-    status = game.state.status
-    initSquares = initSq()
-    IO.puts "----inRender----"
-
-    winner = calculateWinner(xNumbers, oNumbers);
-    availableMoves = checkAvailableMoves(xWasNext, squares)
-    availableMovesOpposite = checkAvailableMoves(!xWasNext, squares)
-
-    if (length(availableMoves) == 0 && length(availableMovesOpposite) == 0) do
-      IO.puts "before winner"
-      winner = cond do
-                xNumbers === oNumbers -> 'XO'
-                xNumbers > oNumbers -> 'X'
-                true -> 'O'
-              end
-      IO.puts "after winner"
-      IO.inspect winner
-    end
-
-    status = if(winner) do
-              cond do
-                winner == 'XO' -> 'It\'s a draw'
-                winner == 'X' -> 'The winner is White!'
-                winner == 'O' -> 'The winner is Black!'
-                xIsNext -> 'Black\'s turn with ' + length(availableMoves) + ' available moves.'
-                true -> 'White\'s turn with ' + length(availableMoves) + ' available moves.'
-              end
-            end
-
-    %{game | winner: winner, availableMoves: availableMoves, availableMovesOpposite: availableMovesOpposite, status: status}
+  def tocheckAvailableMoves(game, color, squares) do
+    IO.puts "INSIDE tocheckAvailableMoves"
+    IO.inspect(squares)
+    availableMoves = getmodifiedIndex_loop(squares, 0, color, [])
+    IO.puts "tocheckAvailableMoves availableMoves: "
+    IO.inspect availableMoves
+    %{game.state | availableMoves: availableMoves}
   end
+
+  def tocheckAvailableMovesOpposite(game, color, squares) do
+    IO.puts "INSIDE tocheckAvailableMovesOpposite"
+    IO.inspect(squares)
+    availableMovesOpposite = getmodifiedIndex_loop(squares, 0, color, [])
+    IO.puts "tocheckAvailableMovesOpposite availableMovesOpposite: "
+    IO.inspect availableMovesOpposite
+    %{game.state | availableMovesOpposite: availableMovesOpposite}
+  end
+
+
+  # def inRender(game) do
+  #   IO.puts "inRender game-----------"
+  #   IO.inspect(game)
+  #   squares = game.state.squares
+  #   xNumbers = game.state.xNumbers
+  #   oNumbers = game.state.oNumbers
+  #   xWasNext = game.state.xWasNext
+  #   xIsNext = game.state.xIsNext
+  #   availableMoves = game.state.availableMoves
+  #   availableMovesOpposite = game.state.availableMovesOpposite
+  #
+  #   initSquares = initSq()
+  #   IO.puts "----inRender----"
+  #
+  #   winner = calculateWinner(xNumbers, oNumbers);
+  #   availableMoves = checkAvailableMoves(xWasNext, squares)
+  #   availableMovesOpposite = checkAvailableMoves(!xWasNext, squares)
+  #
+  #   if (length(availableMoves) == 0 && length(availableMovesOpposite) == 0) do
+  #     IO.puts "before winner"
+  #     winner = cond do
+  #               xNumbers === oNumbers -> 'XO'
+  #               xNumbers > oNumbers -> 'X'
+  #               true -> 'O'
+  #             end
+  #     IO.puts "after winner"
+  #     IO.inspect winner
+  #   end
+  #
+  #   status = if(winner) do
+  #             cond do
+  #               winner == 'XO' -> 'It\'s a draw'
+  #               winner == 'X' -> 'The winner is White!'
+  #               winner == 'O' -> 'The winner is Black!'
+  #               xIsNext -> 'Black\'s turn with ' + length(availableMoves) + ' available moves.'
+  #               true -> 'White\'s turn with ' + length(availableMoves) + ' available moves.'
+  #             end
+  #           end
+  #
+  #   %{game | availableMoves: availableMoves, availableMovesOpposite: availableMovesOpposite}
+  # end
 
 end

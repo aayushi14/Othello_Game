@@ -67,6 +67,13 @@ defmodule OthelloWeb.GamesChannel do
     {:reply, {:ok, %{"game" => game}}, socket}
   end
 
+  def handle_in("tocheckAvailableMovesOpposite", %{"notxWasNext" => notxWasNext, "squares" => squares}, socket) do
+    game = Game.inRender(socket.assigns[:game], notxWasNext, squares)
+    socket = assign(socket, :game, game)
+    Othello.Game.save(socket.assigns[:name], game)
+    {:reply, {:ok, %{"game" => game}}, socket}
+  end
+
   def handle_in("toReset", %{}, socket) do
     game = Game.new()
     socket = assign(socket, :game, game)

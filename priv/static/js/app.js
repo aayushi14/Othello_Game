@@ -31902,10 +31902,8 @@ var Othello = function (_React$Component) {
       oNumbers: 2,
       xWasNext: true,
       xIsNext: true,
-      winner: '',
       availableMoves: [20, 29, 34, 43],
       availableMovesOpposite: [19, 26, 37, 44],
-      status: '',
       player1: "",
       player2: ""
     };
@@ -31925,109 +31923,90 @@ var Othello = function (_React$Component) {
     value: function calculateWinner(xNumbers, oNumbers) {
       return xNumbers + oNumbers < 64 ? null : xNumbers === oNumbers ? 'XO' : xNumbers > oNumbers ? 'X' : 'O';
     }
-  }, {
-    key: 'flipSquares',
-    value: function flipSquares(squares, position, xIsNext) {
-      var modifiedBoard = null;
-      // Calculate row and col of the starting position
-      var startX = position % 8,
-          startY = (position - position % 8) / 8;
 
-      console.log("startX:" + startX + "startY:" + startY);
-      if (squares[position] !== null) {
-        return null;
-      }
-      console.log("Squares:" + squares);
-      console.log("sp:" + squares[position]);
-      // Iterate all directions, these numbers are the offsets in the array to reach next square
-      [1, 7, 8, 9, -1, -7, -8, -9].forEach(function (offset) {
-        var flippedSquares = modifiedBoard ? modifiedBoard.slice() : squares.slice();
-        console.log("flippedSquares:" + flippedSquares);
-        var atleastOneMarkIsFlipped = false;
-        var lastXpos = startX,
-            lastYPos = startY;
+    // flipSquares(squares, position, xIsNext) {
+    //   let modifiedBoard = null;
+    //   // Calculate row and col of the starting position
+    //   let [startX, startY] = [position % 8, (position - position % 8) / 8];
+    //   console.log("startX:" + startX + "startY:" + startY)
+    //   if (squares[position] !== null) {
+    //     return null;
+    //   }
+    //   console.log("Squares:" + squares);
+    //   console.log("sp:" + squares[position]);
+    //   // Iterate all directions, these numbers are the offsets in the array to reach next square
+    //   [1, 7, 8, 9, -1, -7, -8, -9].forEach((offset) => {
+    //   let flippedSquares = modifiedBoard ? modifiedBoard.slice() : squares.slice();
+    //   console.log("flippedSquares:" + flippedSquares);
+    //   let atleastOneMarkIsFlipped = false;
+    //   let [lastXpos, lastYPos] = [startX, startY];
+    //
+    //     for (let y = position + offset; y < 64; y = y + offset) {
+    //
+    //       // Calculate the row and col of the current square
+    //       let [xPos, yPos] = [y % 8, (y - y % 8) / 8];
+    //       console.log("X:" + xPos + "Y:" + yPos);
+    //       // Fix when board is breaking into a new row or col
+    //       if (Math.abs(lastXpos - xPos) > 1 || Math.abs(lastYPos - yPos) > 1) {
+    //         break;
+    //       }
+    //
+    //       console.log("xIsNext: " + xIsNext);
+    //       console.log("flippedSquares[y]: " + flippedSquares[y]);
+    //       console.log("atleastOneMarkIsFlipped: " + atleastOneMarkIsFlipped);
+    //       // Next square was occupied with the opposite color
+    //       if (flippedSquares[y] === (!xIsNext ? 'X' : 'O')) {
+    //         flippedSquares[y] = xIsNext ? 'X' : 'O';
+    //         atleastOneMarkIsFlipped = true;
+    //         [lastXpos, lastYPos] = [xPos, yPos];
+    //         continue;
+    //       }
+    //       // Next square was occupied with the same color
+    //       else if ((flippedSquares[y] === (xIsNext ? 'X' : 'O')) && atleastOneMarkIsFlipped) {
+    //         flippedSquares[position] = xIsNext ? 'X' : 'O';
+    //         modifiedBoard = flippedSquares.slice();
+    //       }
+    //       break;
+    //     }
+    //   });
+    //
+    //   console.log("modifiedBoard: " + modifiedBoard);
+    //   return modifiedBoard;
+    // }
 
+    // checkAvailableMoves(color, squares) {
+    //   return this.state.squares
+    //   .map((value, index) => { return this.flipSquares(squares, index, color) ? index : null; })
+    //   .filter((item) => { return item !== null; });
+    // }
 
-        for (var y = position + offset; y < 64; y = y + offset) {
+    // handleClick(i) {
+    //   if (this.calculateWinner(this.state.xNumbers, this.state.oNumbers) || this.state.squares[i]) {
+    //     return;
+    //   }
+    //
+    //   const changedSquares = this.flipSquares(this.state.squares, i, this.state.xIsNext);
+    //
+    //   if (changedSquares === null) {
+    //     return;
+    //   }
+    //
+    //   const xNumbers = changedSquares.reduce((acc, current) => { return current === 'X' ? acc + 1 : acc }, 0);
+    //   const oNumbers = changedSquares.reduce((acc, current) => { return current === 'O' ? acc + 1 : acc }, 0);
+    //
+    //   let shouldTurnColor = this.checkAvailableMoves(!this.state.xIsNext, changedSquares).length > 0 ? !this.state.xIsNext : this.state.xIsNext
+    //
+    //   this.setState({
+    //     squares: changedSquares,
+    //     xNumbers: xNumbers,
+    //     oNumbers: oNumbers,
+    //     xWasNext: shouldTurnColor,
+    //     xIsNext: shouldTurnColor,
+    //     player1: "rc",
+    //     player2: ""
+    //   });
+    // }
 
-          // Calculate the row and col of the current square
-          var xPos = y % 8,
-              yPos = (y - y % 8) / 8;
-
-          console.log("X:" + xPos + "Y:" + yPos);
-          // Fix when board is breaking into a new row or col
-          if (Math.abs(lastXpos - xPos) > 1 || Math.abs(lastYPos - yPos) > 1) {
-            break;
-          }
-
-          console.log("xIsNext: " + xIsNext);
-          console.log("flippedSquares[y]: " + flippedSquares[y]);
-          console.log("atleastOneMarkIsFlipped: " + atleastOneMarkIsFlipped);
-          // Next square was occupied with the opposite color
-          if (flippedSquares[y] === (!xIsNext ? 'X' : 'O')) {
-            flippedSquares[y] = xIsNext ? 'X' : 'O';
-            atleastOneMarkIsFlipped = true;
-            lastXpos = xPos;
-            lastYPos = yPos;
-
-            continue;
-          }
-          // Next square was occupied with the same color
-          else if (flippedSquares[y] === (xIsNext ? 'X' : 'O') && atleastOneMarkIsFlipped) {
-              flippedSquares[position] = xIsNext ? 'X' : 'O';
-              modifiedBoard = flippedSquares.slice();
-            }
-          break;
-        }
-      });
-
-      console.log("modifiedBoard: " + modifiedBoard);
-      return modifiedBoard;
-    }
-  }, {
-    key: 'checkAvailableMoves',
-    value: function checkAvailableMoves(color, squares) {
-      var _this2 = this;
-
-      console.log(this.flipSquares(squares, 20, color));
-      return this.state.squares.map(function (value, index) {
-        return _this2.flipSquares(squares, index, color) ? index : null;
-      }).filter(function (item) {
-        return item !== null;
-      });
-    }
-  }, {
-    key: 'handleClick',
-    value: function handleClick(i) {
-      if (this.calculateWinner(this.state.xNumbers, this.state.oNumbers) || this.state.squares[i]) {
-        return;
-      }
-
-      var changedSquares = this.flipSquares(this.state.squares, i, this.state.xIsNext);
-
-      if (changedSquares === null) {
-        return;
-      }
-
-      var xNumbers = changedSquares.reduce(function (acc, current) {
-        return current === 'X' ? acc + 1 : acc;
-      }, 0);
-      var oNumbers = changedSquares.reduce(function (acc, current) {
-        return current === 'O' ? acc + 1 : acc;
-      }, 0);
-
-      var shouldTurnColor = this.checkAvailableMoves(!this.state.xIsNext, changedSquares).length > 0 ? !this.state.xIsNext : this.state.xIsNext;
-
-      this.setState({
-        squares: changedSquares,
-        xNumbers: xNumbers,
-        oNumbers: oNumbers,
-        xWasNext: shouldTurnColor,
-        xIsNext: shouldTurnColor,
-        player1: "rc",
-        player2: ""
-      });
-    }
   }, {
     key: 'handleClick',
     value: function handleClick(id) {
@@ -32044,27 +32023,50 @@ var Othello = function (_React$Component) {
     value: function resetGame() {
       this.channel.push("toReset").receive("ok", this.gotView.bind(this));
     }
-  }, {
-    key: 'calculateWinner',
-    value: function calculateWinner(xNumbers, oNumbers) {
-      this.channel.push("tocalculateWinner", { xNumbers: xNumbers, oNumbers: oNumbers }).receive("ok", this.gotView.bind(this));
-    }
+
+    // calculateWinner(xNumbers, oNumbers) {
+    //   this.channel.push("tocalculateWinner", {xNumbers: xNumbers, oNumbers: oNumbers})
+    //   .receive("ok", this.gotView.bind(this));
+    // }
+
   }, {
     key: 'checkAvailableMoves',
     value: function checkAvailableMoves(xWasNext, squares) {
       this.channel.push("tocheckAvailableMoves", { xWasNext: xWasNext, squares: squares }).receive("ok", this.gotView.bind(this));
     }
   }, {
+    key: 'checkAvailableMovesOpposite',
+    value: function checkAvailableMovesOpposite(notxWasNext, squares) {
+      this.channel.push("tocheckAvailableMovesOpposite", { notxWasNext: notxWasNext, squares: squares }).receive("ok", this.gotView.bind(this));
+    }
+  }, {
     key: 'render',
     value: function render() {
-      var _this3 = this;
+      var _this2 = this;
 
-      //{this.insideRender()}
+      var winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
+      console.log("winner: " + winner);
+
+      this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+      console.log("availableMoves: " + this.state.availableMoves);
+
+      this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
+      console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
+
+      console.log("availableMoves.length: " + this.state.availableMoves.length);
+      if (this.state.availableMoves.length === 0 && this.state.availableMovesOpposite.length === 0) {
+        winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
+      }
+
+      var status = winner ? winner === 'XO' ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') : [this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
+
       // let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
-      //
+      // console.log("winner: " + winner);
       // let availableMoves = this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+      // console.log("availableMoves: " + availableMoves);
       // let availableMovesOpposite = this.checkAvailableMoves(!this.state.xWasNext, this.state.squares);
-      //
+      // console.log("availableMovesOpposite: " + availableMovesOpposite);
+      // console.log("availableMoves.length: " + availableMoves.length);
       // if ((availableMoves.length === 0) && (availableMovesOpposite.length === 0)) {
       //   winner = this.state.xNumbers === this.state.oNumbers ? 'XO' : this.state.xNumbers > this.state.oNumbers ? 'X' : 'O';
       // }
@@ -32084,7 +32086,7 @@ var Othello = function (_React$Component) {
             'div',
             { className: 'game-board' },
             _react2.default.createElement(_board2.default, { squares: this.state.squares, availableMoves: this.state.availableMoves, onClick: function onClick(i) {
-                return _this3.handleClick(i);
+                return _this2.handleClick(i);
               } })
           ),
           _react2.default.createElement('div', null)
@@ -32108,12 +32110,12 @@ var Othello = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'game-status' },
-            this.state.status,
+            status,
             '\xA0',
-            this.state.winner ? _react2.default.createElement(
+            winner ? _react2.default.createElement(
               'button',
               { onClick: function onClick() {
-                  return _this3.resetGame();
+                  return _this2.resetGame();
                 } },
               'Play again'
             ) : ''
