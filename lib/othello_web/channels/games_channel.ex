@@ -5,17 +5,22 @@ defmodule OthelloWeb.GamesChannel do
   alias Othello.GameBackup
 
   def join("games:" <> g_name, params, socket) do
+    IO.puts "INSIDE JOIN"
     # or the game has already started
     user = params["user"]
     game = GameBackup.load(g_name) || Game.new()
+    IO.puts "squares length"
+    IO.inspect length(game.squares)
+    
     IO.inspect game
 
     game = Game.join(game, user)
+
     GameBackup.save(g_name, game)
     socket = socket
       |> assign(:name, g_name)
 
-    send(self(), :after_join)
+    # send(self(), :after_join)
     {:ok, %{"join" => g_name, "game" => Game.client_view(game)}, socket}
   end
 
@@ -56,7 +61,6 @@ defmodule OthelloWeb.GamesChannel do
     socket = assign(socket, :game, game)
     {:reply, {:ok, %{"game" => game}}, socket}
   end
-
 
 
   def handle_in("tocheckAvailableMovesOpposite", %{"notxWasNext" => notxWasNext, "squares" => squares}, socket) do

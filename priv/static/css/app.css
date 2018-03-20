@@ -6067,11 +6067,10 @@ h1 {
 ol, ul {
   padding-left: 30px; }
 
-.player1name {
-  text-align: left; }
-
-.player2name {
-  text-align: right; }
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center; }
 
 .board {
   border: 3px solid black;
@@ -6140,6 +6139,19 @@ ol, ul {
 .marker.white {
   background: #eee;
   border: 1px solid #111; }
+
+#black_side {
+  background-color: black;
+  color: white;
+  font-size: 150%; }
+
+#message {
+  font-size: 120%; }
+
+#white_side {
+  background-color: white;
+  color: black;
+  font-size: 150%; }
 
 
 

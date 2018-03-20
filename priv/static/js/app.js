@@ -116,6 +116,7 @@
 
 (function() {
 var global = typeof window === 'undefined' ? this : window;
+var process;
 var __makeRelativeRequire = function(require, mappings, pref) {
   var none = {};
   var tryReq = function(name, pref) {
@@ -31887,8 +31888,9 @@ var Othello = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Othello.__proto__ || Object.getPrototypeOf(Othello)).call(this, props));
 
+    console.log(props);
     _this.channel = props.channel;
-
+    console.log(_this.channel);
     var initSquares = Array(64).fill(null);
     var _ref = ["X", "O", "X", "O"];
     initSquares[8 * 3 + 3] = _ref[0];
@@ -31935,98 +31937,12 @@ var Othello = function (_React$Component) {
       this.setState(view.game);
       console.log("gotView: ");
       console.log(view.game);
-      console.log(view.game.state);
-      console.log(view.game.host);
     }
   }, {
     key: 'calculateWinner',
     value: function calculateWinner(xNumbers, oNumbers) {
       return xNumbers + oNumbers < 64 ? null : xNumbers === oNumbers ? "XO" : xNumbers > oNumbers ? "X" : "O";
     }
-
-    // flipSquares(squares, position, xIsNext) {
-    //   let modifiedBoard = null;
-    //   // Calculate row and col of the starting position
-    //   let [startX, startY] = [position % 8, (position - position % 8) / 8];
-    //   console.log("startX:" + startX + "startY:" + startY)
-    //   if (squares[position] !== null) {
-    //     return null;
-    //   }
-    //   console.log("Squares:" + squares);
-    //   console.log("sp:" + squares[position]);
-    //   // Iterate all directions, these numbers are the offsets in the array to reach next square
-    //   [1, 7, 8, 9, -1, -7, -8, -9].forEach((offset) => {
-    //   let flippedSquares = modifiedBoard ? modifiedBoard.slice() : squares.slice();
-    //   console.log("flippedSquares:" + flippedSquares);
-    //   let atleastOneMarkIsFlipped = false;
-    //   let [lastXpos, lastYPos] = [startX, startY];
-    //
-    //     for (let y = position + offset; y < 64; y = y + offset) {
-    //
-    //       // Calculate the row and col of the current square
-    //       let [xPos, yPos] = [y % 8, (y - y % 8) / 8];
-    //       console.log("X:" + xPos + "Y:" + yPos);
-    //       // Fix when board is breaking into a new row or col
-    //       if (Math.abs(lastXpos - xPos) > 1 || Math.abs(lastYPos - yPos) > 1) {
-    //         break;
-    //       }
-    //
-    //       console.log("xIsNext: " + xIsNext);
-    //       console.log("flippedSquares[y]: " + flippedSquares[y]);
-    //       console.log("atleastOneMarkIsFlipped: " + atleastOneMarkIsFlipped);
-    //       // Next square was occupied with the opposite color
-    //       if (flippedSquares[y] === (!xIsNext ? 'X' : 'O')) {
-    //         flippedSquares[y] = xIsNext ? 'X' : 'O';
-    //         atleastOneMarkIsFlipped = true;
-    //         [lastXpos, lastYPos] = [xPos, yPos];
-    //         continue;
-    //       }
-    //       // Next square was occupied with the same color
-    //       else if ((flippedSquares[y] === (xIsNext ? 'X' : 'O')) && atleastOneMarkIsFlipped) {
-    //         flippedSquares[position] = xIsNext ? 'X' : 'O';
-    //         modifiedBoard = flippedSquares.slice();
-    //       }
-    //       break;
-    //     }
-    //   });
-    //
-    //   console.log("modifiedBoard: " + modifiedBoard);
-    //   return modifiedBoard;
-    // }
-
-    // checkAvailableMoves(color, squares) {
-    //   return this.state.squares
-    //   .map((value, index) => { return this.flipSquares(squares, index, color) ? index : null; })
-    //   .filter((item) => { return item !== null; });
-    // }
-
-    // handleClick(i) {
-    //   if (this.calculateWinner(this.state.xNumbers, this.state.oNumbers) || this.state.squares[i]) {
-    //     return;
-    //   }
-    //
-    //   const changedSquares = this.flipSquares(this.state.squares, i, this.state.xIsNext);
-    //
-    //   if (changedSquares === null) {
-    //     return;
-    //   }
-    //
-    //   const xNumbers = changedSquares.reduce((acc, current) => { return current === 'X' ? acc + 1 : acc }, 0);
-    //   const oNumbers = changedSquares.reduce((acc, current) => { return current === 'O' ? acc + 1 : acc }, 0);
-    //
-    //   let shouldTurnColor = this.checkAvailableMoves(!this.state.xIsNext, changedSquares).length > 0 ? !this.state.xIsNext : this.state.xIsNext
-    //
-    //   this.setState({
-    //     squares: changedSquares,
-    //     xNumbers: xNumbers,
-    //     oNumbers: oNumbers,
-    //     xWasNext: shouldTurnColor,
-    //     xIsNext: shouldTurnColor,
-    //     player1: "rc",
-    //     player2: ""
-    //   });
-    // }
-
   }, {
     key: 'handleClick',
     value: function handleClick(id) {
@@ -32041,12 +31957,12 @@ var Othello = function (_React$Component) {
   }, {
     key: 'checkAvailableMoves',
     value: function checkAvailableMoves(xWasNext, squares) {
-      this.channel.push("tocheckAvailableMoves", { xWasNext: xWasNext, squares: squares }).receive("ok", this.gotView.bind(this));
+      this.channel.push("tocheckAvailableMoves", { xWasNext: xWasNext, squares: squares });
     }
   }, {
     key: 'checkAvailableMovesOpposite',
     value: function checkAvailableMovesOpposite(notxWasNext, squares) {
-      this.channel.push("tocheckAvailableMovesOpposite", { notxWasNext: notxWasNext, squares: squares }).receive("ok", this.gotView.bind(this));
+      this.channel.push("tocheckAvailableMovesOpposite", { notxWasNext: notxWasNext, squares: squares });
     }
   }, {
     key: 'render',
@@ -32056,20 +31972,19 @@ var Othello = function (_React$Component) {
       console.log("INSIDE render: ");
       var winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
       console.log("winner: " + winner);
-
       // this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
       // console.log("availableMoves: " + this.state.availableMoves);
 
       // this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
       // console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
 
-      console.log("availableMoves.length: " + this.state.availableMoves.length);
+      // console.log("availableMoves length => " + this.state.availableMoves.length);
+
       if (this.state.availableMoves.length === 0 && this.state.availableMovesOpposite.length === 0) {
         winner = this.state.xNumbers === this.state.oNumbers ? "XO" : this.state.xNumbers > this.state.oNumbers ? "X" : "O";
       }
 
       var status = winner ? winner === "XO" ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') : [this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
-      console.log(this.state);
 
       var black_player_status = "";
       var white_player_status = "";
@@ -32352,7 +32267,7 @@ function Square(props) {
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
 require.alias("process/browser.js", "process");
-require.alias("underscore/underscore.js", "underscore");require.register("___globals___", function(exports, require, module) {
+require.alias("underscore/underscore.js", "underscore");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 
 // Auto-loaded modules from config.npm.globals.

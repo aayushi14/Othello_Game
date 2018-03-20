@@ -32,13 +32,13 @@ defmodule Othello.Game do
 
   @board_squares 0..63
 
-  defp initSq do
+  def initSq do
     initSquares = Enum.map(@board_squares, fn(x) -> nil end)
     initSquares = initSquares
-                  |> List.insert_at(27, "X")
-                  |> List.insert_at(28, "O")
-                  |> List.insert_at(35, "O")
-                  |> List.insert_at(36, "X")
+                  |> List.replace_at(27, "X")
+                  |> List.replace_at(28, "O")
+                  |> List.replace_at(35, "O")
+                  |> List.replace_at(36, "X")
     initSquares
   end
 
@@ -76,6 +76,7 @@ defmodule Othello.Game do
     }
   end
 
+
   def toReset(game) do
     squares = game.squares
     xNumbers = game.xNumbers
@@ -93,9 +94,9 @@ defmodule Othello.Game do
     IO.puts "inside calculateWinner"
     c_winner = cond do
                 xNumbers + oNumbers < 64 -> nil
-                xNumbers === oNumbers -> 'XO'
-                xNumbers > oNumbers -> 'X'
-                true -> 'O'
+                xNumbers === oNumbers -> "XO"
+                xNumbers > oNumbers -> "X"
+                true -> "O"
               end
     IO.puts "c_winner"
     IO.inspect c_winner
@@ -112,12 +113,15 @@ defmodule Othello.Game do
   end
 
   defp infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when y >= 64, do: modifiedBoard
+
   defp infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when y < 64 do
     IO.puts "INSIDE infor_loop: "
     # Calculate the row and col of the current square
     {xPos, yPos} = {rem(y,8), div((y - rem(y,8)),8)}
     IO.puts "xPos, yPos : "
     IO.inspect {xPos, yPos}
+    IO.puts "lastXpos, lastYPos"
+    IO.inspect {lastXpos, lastYpos}
 
     # Fix when board is breaking into a new row or col
     if (abs(lastXpos - xPos) > 1 || abs(lastYpos - yPos) > 1) do
@@ -128,11 +132,14 @@ defmodule Othello.Game do
       IO.puts "else of FIX board flippedSquares: "
       IO.inspect flippedSquares
       IO.inspect xIsNext
+       IO.puts "infor_loop just before COND"
+        IO.inspect Enum.at(flippedSquares, y)
       cond do
+
         # Next square was occupied with the opposite color
-        Enum.at(flippedSquares,y) === (if !xIsNext, do: 'X', else: 'O') ->
+        Enum.at(flippedSquares,y) === (if !xIsNext, do: "X", else: "O") ->
           sq = Enum.at(flippedSquares, y)
-          sq = if xIsNext, do: 'X', else: 'O'
+          sq = if xIsNext, do: "X", else: "O"
           IO.puts "first cond sq: "
           IO.inspect sq
           flippedSquares = List.replace_at(flippedSquares, y, sq)
@@ -146,8 +153,8 @@ defmodule Othello.Game do
           IO.inspect offset
           modifiedBoard = for_loop(y + offset, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
         # Next square was occupied with the same color
-        (Enum.at(flippedSquares,y) === (if xIsNext, do: 'X', else: 'O')) && atleastOneMarkIsFlipped ->
-          sq = if xIsNext, do: 'X', else: 'O'
+        (Enum.at(flippedSquares,y) === (if xIsNext, do: "X", else: "O")) && atleastOneMarkIsFlipped ->
+          sq = if xIsNext, do: "X", else: "O"
           IO.puts "second cond sq: "
           IO.inspect sq
           flippedSquares = List.replace_at(flippedSquares, position, sq)
@@ -232,7 +239,7 @@ defmodule Othello.Game do
       IO.inspect squares
       IO.puts "sp:"
       IO.inspect Enum.at(squares, position)
-      nil
+      modifiedBoard = nil
     else
       # Iterate all directions, these numbers are the offsets in the array to reach next square
       modifiedBoard = foreach_loop(0, squares, position, xIsNext, modifiedBoard, startX, startY)
@@ -312,8 +319,8 @@ defmodule Othello.Game do
         changedSquares = squares
       else
         IO.puts "else, if, else, tohandleClick"
-        xNumbers = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === 'X', do: acc + 1, else: acc) end)
-        oNumbers = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === 'O', do: acc + 1, else: acc) end)
+        xNumbers = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "X", do: acc + 1, else: acc) end)
+        oNumbers = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "O", do: acc + 1, else: acc) end)
         shouldTurnColor = if length(checkAvailableMoves(!xIsNext, changedSquares)) > 0, do: !xIsNext, else: xIsNext
         IO.puts "shouldTurnColor"
         IO.inspect shouldTurnColor
@@ -362,9 +369,9 @@ defmodule Othello.Game do
   #   if (length(availableMoves) == 0 && length(availableMovesOpposite) == 0) do
   #     IO.puts "before winner"
   #     winner = cond do
-  #               xNumbers === oNumbers -> 'XO'
-  #               xNumbers > oNumbers -> 'X'
-  #               true -> 'O'
+  #               xNumbers === oNumbers -> "XO"
+  #               xNumbers > oNumbers -> "X"
+  #               true -> "O"
   #             end
   #     IO.puts "after winner"
   #     IO.inspect winner
@@ -372,9 +379,9 @@ defmodule Othello.Game do
   #
   #   status = if(winner) do
   #             cond do
-  #               winner == 'XO' -> 'It\'s a draw'
-  #               winner == 'X' -> 'The winner is White!'
-  #               winner == 'O' -> 'The winner is Black!'
+  #               winner == "XO" -> 'It\'s a draw'
+  #               winner == "X" -> 'The winner is White!'
+  #               winner == "O" -> 'The winner is Black!'
   #               xIsNext -> 'Black\'s turn with ' + length(availableMoves) + ' available moves.'
   #               true -> 'White\'s turn with ' + length(availableMoves) + ' available moves.'
   #             end
