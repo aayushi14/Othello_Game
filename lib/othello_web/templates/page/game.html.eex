@@ -3,9 +3,9 @@
     <li><a href="/">Go Back</a></li>
   </ul>
 </nav>
-<h1>Othello Game</h1>
+<h1>Othello Game: <%= @game %></h1>
 <script>
-  window.gameName = "<%= @game %>";
+  window.g_name = "<%= @game %>";
   window.user = "<%= @user %>"
 </script>
 <div class="container">
@@ -21,4 +21,3 @@
   </div>
 
 </div>
-

@@ -10,19 +10,24 @@ class Othello extends React.Component {
   constructor(props) {
     super(props);
     this.channel = props.channel;
+
     const initSquares = Array(64).fill(null);
     [initSquares[8 * 3 + 3], initSquares[8 * 3 + 4], initSquares[8 * 4 + 4], initSquares[8 * 4 + 3]] = ["X", "O", "X", "O"];
+    console.log("constructor initSquares: ");
+    console.log(initSquares);
 
     this.state = {
       squares: initSquares,
-      xNumbers: 2,
-      oNumbers: 2,
+      xNumbers: 2,                              // number of black color pieces
+      oNumbers: 2,                              // number of white color pieces
       xWasNext: true,
       xIsNext: true,
-      availableMoves: [20, 29, 34, 43],
-      availableMovesOpposite: [19, 26, 37, 44],
-      player1: "",
-      player2: "",
+      availableMoves: [20, 29, 34, 43],         // the available moves for black player (current)
+      availableMovesOpposite: [19, 26, 37, 44], // the available moves for white player
+      black_player: "",                         // name of the player with black colored pieces
+      white_player: "",                         // name of the player with white colored pieces
+      spectators: [],                           // the list of spectators
+      current_player: "",                       // black player moves first
     };
 
     this.channel.on("tocheckAvailableMoves", this.checkAvailableMoves);
@@ -158,6 +163,7 @@ class Othello extends React.Component {
   }
 
   render() {
+    console.log("INSIDE render: ");
     let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
     console.log("winner: " + winner);
 
@@ -177,19 +183,82 @@ class Othello extends React.Component {
       		(winner === "XO") ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') :
       		[this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
     console.log(this.state);
+
+
+    let black_player_status = "";
+    let white_player_status = "";
+    if (this.state.black_player == "" || this.state.white_player == "") {
+      black_player_status = "Wait...";
+      white_player_status = "Wait...";
+    } else if (this.state.current_player == this.state.black_player) {
+      black_player_status = "Make your Move";
+      white_player_status = "Wait...";
+    } else {
+      black_player_status = "Wait...";
+      white_player_status = "Make your Move";
+    }
+
     return (
       <div className="game">
-        <div className="game-left-side">
-          <div className="game-board">
-            <Board squares={this.state.squares} availableMoves={this.state.availableMoves} onClick={(i) => this.handleClick(i)} />
+        <div className="container">
+          <div className="row justify-content-md-center">
+            <div className="col">
+
+              <div className="container">
+                <div className="row align-items-start">
+                  <div className="col">
+                    <div className="container">
+                      <div className="row align-items-start">
+                        <div className="col" id="black_side">BLACK</div>
+                      </div>
+                      <div className="row align-items-start">
+                        <div className="col" id="notice">{ this.state.black_player }</div>
+                      </div>
+                      <div className="row align-items-start">
+                        <div className="col" id="black_side">{ black_player_status }</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div><br /><br /><br /></div>
+                <div className="row align-items-end">
+                  <div className="col">
+                    <div className="container">
+                      <div className="row">
+                        <div className="col" id="white_side">WHITE</div>
+                      </div>
+                      <div className="row">
+                        <div className="col" id="message">{ this.state.white_player }</div>
+                      </div>
+                      <div className="row">
+                        <div className="col" id="white_side">{ white_player_status }</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-auto">
+              <div className="container">
+                <div className="game-left-side">
+                  <div className="game-board">
+                    <Board squares={this.state.squares} availableMoves={this.state.availableMoves} onClick={(i) => this.handleClick(i)} />
+                  </div>
+                  <div></div>
+                </div>
+              </div>
+            </div>
+            <div className="col">
+              <div className="container">
+                <div className="game-info">
+                  <div>Black markers: {this.state.xNumbers}</div>
+                  <div>White markers: {this.state.oNumbers}</div>
+                  <br />
+                  <div className="game-status">{status}&nbsp;{winner ? <button onClick={() => this.resetGame()}>Play again</button> : ''}</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div></div>
-        </div>
-        <div className="game-info">
-          <div>Black markers: {this.state.xNumbers}</div>
-          <div>White markers: {this.state.oNumbers}</div>
-          <br />
-          <div className="game-status">{status}&nbsp;{winner ? <button onClick={() => this.resetGame()}>Play again</button> : ''}</div>
         </div>
       </div>
     );

@@ -17,18 +17,18 @@ defmodule Othello.GameBackup do
     end
   end
 
-  #   # For lobby to get all game names
-  # def lobby do
-  #   Agent.get __MODULE__, fn state ->
-  #     Map.keys(state)
-  #   end
-  # end
+  # A room to get all game names
+  def room do
+    Agent.get __MODULE__, fn state ->
+      Map.keys(state)
+    end
+  end
 
-  # # Return the map of all game instances
-  # def instances do
-  #   Agent.get __MODULE__, fn state ->
-  #     state
-  #   end
-  # end
+  # Return the map of all game instances
+  def instances do
+    Agent.get __MODULE__, fn state ->
+      state
+    end
+  end
 
 end

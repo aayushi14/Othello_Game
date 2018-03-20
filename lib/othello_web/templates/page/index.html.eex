@@ -16,12 +16,30 @@
   }
 </script>
 
-<h1>Othello Game</h1>
+<h1>Othello Game Room</h1>
+
+<div class="container">
+  <%= for r <- @room do %>
+    <div class="card">
+      <div class="card-header">Game: <%= r %></div>
+      <div class="card-text" id="black_block"><%= Map.get(Map.get(@instances, r), :blackPlayer) %></div>
+      <div class="card-text" id="black_block"><%= Map.get(Map.get(@instances, r), :blackPieces) %> pieces</div>
+      <div class="card-text"><%= Map.get(Map.get(@instances, r), :whitePlayer) %></div>
+      <div class="card-text" id="white_block"><%= Map.get(Map.get(@instances, r), :whitePiece) %> pieces</div>
+      <div class="card-text" id="spectator"><%= Map.get(Map.get(@instances, r), :spectators) %></div>
+      <div class="card-text">Status: Test</div>
+
+      <div class="card-text"><button id="join">Join</button></div>
+    </div>
+  <% end %>
+  <br />
+</div>
+
 <div class="row">
   <div class="col">
     <h3>Join a Game</h3>
-    <p>Enter your name and the name of a game to join a game.</p>
-    <p>To create a new game, pick an unused name and share it with the other players.</p>
+    <p>To create a new game, pick an unused name.</p>
+    <p>To join an existing game, pick any name from above.</p>
 
     <p>Enter your Name: <input id="user" type="text"/>
     <p>Enter game name: <input id="g_name" type="text"></p>
@@ -30,13 +48,3 @@
 
   </div>
 </div>
-
-
-
-
-
-
-
-
-
-

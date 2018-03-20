@@ -1,32 +1,34 @@
 defmodule Othello.Game do
 
-  # use Agent
-
-  # def start_link do
-  #   Agent.start_link(fn -> %{} end, name: __MODULE__)
-  # end
-
-  # def save(gname, game) do
-  #   Agent.update __MODULE__, fn state ->
-  #     Map.put(state, gname, game)
-  #   end
-  # end
-
-  # def load(gname) do
-  #   Agent.get __MODULE__, fn state ->
-  #     Map.get(state, gname)
-  #   end
-  # end
-
-  # def join(game, user) do
-  #   game = load(gname)
-  #   if game do
-  #     game
-  #   else
-  #     game = %{ gname: gname, host: user, state: new() }
-  #     save(gname, game)
-  #   end
-  # end
+  # Join a new user
+  # If it is first user, set it with black piece
+  # If it is second user, set it with white piece
+  # else add the user in the observer list
+  def join(game, user) do
+    cond do
+      # if the user has already joined, return that game
+      game.black_player == user or game.white_player == user or Enum.member?(game.spectators, user) ->
+        game
+      game.black_player == "" and game.white_player == "" ->
+        if :rand.uniform(2) == 1 do
+          Map.put(game, :white_player, user)
+        else
+          game
+          |> Map.put(:black_player, user)
+          |> Map.put(:current_player, user)
+        end
+      game.black_player == "" or game.white_player == "" ->
+        if game.white_player == "" do
+          Map.put(game, :white_player, user)
+        else
+          game
+          |> Map.put(:black_player, user)
+          |> Map.put(:current_player, user)
+        end
+      true ->
+        Map.put(game, :spectators, List.insert_at(game.spectators, -1, user))
+    end
+  end
 
   @board_squares 0..63
 
@@ -50,23 +52,27 @@ defmodule Othello.Game do
       xIsNext: true,
       availableMoves: [20, 29, 34, 43],
       availableMovesOpposite: [19, 26, 37, 44],
-      player1: "arcy",
-      player2: "",
+      black_player: "",
+      white_player: "",
+      spectators: [],
+      current_player: "",
     }
   end
 
+  # Initialize the board
   def client_view(game) do
-    initSquares = initSq()
     %{
-      squares: initSquares,
-      xNumbers: 2,
-      oNumbers: 2,
-      xWasNext: true,
-      xIsNext: true,
-      availableMoves: [20, 29, 34, 43],
-      availableMovesOpposite: [19, 26, 37, 44],
-      player1: "",
-      player2: "",
+      squares: game.squares,
+      xNumbers: game.xNumbers,
+      oNumbers: game.oNumbers,
+      xWasNext: game.xWasNext,
+      xIsNext: game.xIsNext,
+      availableMoves: game.availableMoves,
+      availableMovesOpposite: game.availableMovesOpposite,
+      black_player: game.black_player,
+      white_player: game.white_player,
+      spectators: game.spectators,
+      current_player: game.current_player,
     }
   end
 

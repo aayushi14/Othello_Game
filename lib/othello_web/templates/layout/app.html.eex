@@ -5,12 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="author" content="Aayushi Maheshwari and Arcy Flores">
     <title>Hello Othello!</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
     <script>
-      window.userToken = "<%= assigns[:user_token] %>";
+      window.userToken = "TODO";
     </script>
   </head>
 
@@ -24,11 +24,9 @@
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
      <% end %>
 
-
-      <%= render @view_module, @view_template, assigns %>
-
+     <%= render @view_module, @view_template, assigns %>
 
     </div> <!-- /container -->
-    
+
   </body>
 </html>

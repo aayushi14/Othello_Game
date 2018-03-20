@@ -1,9 +1,10 @@
 defmodule OthelloWeb.PageController do
   use OthelloWeb, :controller
 
+  alias Othello.GameBackup
+
   def index(conn, _params) do
-    render conn, "index.html"
-    # , lobby: GameBackUp.lobby, instances: GameBackUp.instances
+    render conn, "index.html", room: GameBackup.room, instances: GameBackup.instances
   end
 
     def game(conn, params) do
