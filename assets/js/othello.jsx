@@ -31,8 +31,8 @@ class Othello extends React.Component {
       current_player: "",                       // black player moves first
     };
 
-    this.channel.on("tocheckAvailableMoves", this.checkAvailableMoves);
-    this.channel.on("tocheckAvailableMovesOpposite", this.checkAvailableMovesOpposite);
+    // this.channel.on("tocheckAvailableMoves", this.checkAvailableMoves);
+    // this.channel.on("tocheckAvailableMovesOpposite", this.checkAvailableMovesOpposite);
 
     this.channel.on("join", payload => {
       let game_state = payload.game_state;
@@ -80,13 +80,13 @@ class Othello extends React.Component {
     console.log("INSIDE render: ");
     let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
     console.log("winner: " + winner);
-    // this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
-    // console.log("availableMoves: " + this.state.availableMoves);
+    this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+    console.log("availableMoves: " + this.state.availableMoves);
 
-    // this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
-    // console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
+    this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
+    console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
 
-    // console.log("availableMoves length => " + this.state.availableMoves.length);
+    console.log("availableMoves length => " + this.state.availableMoves.length);
 
     if ((this.state.availableMoves.length === 0) && (this.state.availableMovesOpposite.length === 0)) {
       winner = this.state.xNumbers === this.state.oNumbers ? "XO" : this.state.xNumbers > this.state.oNumbers ? "X" : "O";
@@ -96,7 +96,7 @@ class Othello extends React.Component {
       	winner ?
       		(winner === "XO") ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') :
       		[this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
- 
+
 
 
     let black_player_status = "";

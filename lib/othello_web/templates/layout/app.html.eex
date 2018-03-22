@@ -11,12 +11,12 @@
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
     <script>
       window.userToken = "TODO";
-    </script>
+    </script>  
   </head>
 
   <body>
     <div class="container">
-      
+
      <%= if get_flash(@conn, :info) do %>
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
      <% end %>

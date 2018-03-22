@@ -293,10 +293,10 @@ defmodule Othello.Game do
   def checkAvailableMoves(color, squares) do
     IO.puts "============INSIDE checkAvailableMoves============"
     IO.inspect(squares)
-    availableMoves = getmodifiedIndex_loop(squares, 0, color, [])
-    IO.puts "availableSquares: "
-    IO.inspect availableMoves
-    availableMoves
+    modifiedSquares = getmodifiedIndex_loop(squares, 0, color, [])
+    IO.puts "modifiedSquares: "
+    IO.inspect modifiedSquares
+    modifiedSquares
   end
 
   def tohandleClick(game, id) do
@@ -307,6 +307,9 @@ defmodule Othello.Game do
     oNumbers = game.oNumbers
     xWasNext = game.xWasNext
     xIsNext = game.xIsNext
+    black_player = game.black_player
+    white_player = game.white_player
+    current_player= game.current_player
 
     if calculateWinner(xNumbers, oNumbers) || Enum.at(squares,id) do
       IO.puts "tohandleClick calculateWinner"
@@ -326,23 +329,46 @@ defmodule Othello.Game do
         IO.inspect shouldTurnColor
       end
     end
-    %{game | squares: changedSquares, xNumbers: xNumbers, oNumbers: oNumbers, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor}
+
+    IO.puts "black_player"
+    IO.inspect black_player
+    IO.puts "white_player"
+    IO.inspect "white_player"
+    IO.puts "current_player"
+    IO.inspect "current_player"
+    IO.puts "*******************************"
+
+    if current_player == black_player do
+      current_player = white_player
+    else
+      current_player = black_player
+    end
+    IO.puts "current_player"
+    IO.inspect "current_player"
+
+    %{game | squares: changedSquares, xNumbers: xNumbers, oNumbers: oNumbers, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor, current_player: current_player}
   end
 
   def tocheckAvailableMoves(game, color, squares) do
-    IO.puts "INSIDE tocheckAvailableMoves"
+    availableMoves = game.availableMoves
+    IO.puts "INSIDE tocheckAvailableMoves squares"
     IO.inspect(squares)
-    availableMoves = getmodifiedIndex_loop(squares, 0, color, [])
-    IO.puts "tocheckAvailableMoves availableMoves: "
+    IO.puts "INSIDE tocheckAvailableMoves availableMoves"
+    IO.inspect(availableMoves)
+    availableMoves = checkAvailableMoves(color, squares)
+    IO.puts "after checkAvailableMoves availableMoves: "
     IO.inspect availableMoves
     %{game | availableMoves: availableMoves}
   end
 
   def tocheckAvailableMovesOpposite(game, color, squares) do
-    IO.puts "INSIDE tocheckAvailableMovesOpposite"
+    availableMovesOpposite = game.availableMovesOpposite
+    IO.puts "INSIDE tocheckAvailableMovesOpposite squares"
     IO.inspect(squares)
-    availableMovesOpposite = getmodifiedIndex_loop(squares, 0, color, [])
-    IO.puts "tocheckAvailableMovesOpposite availableMovesOpposite: "
+    IO.puts "INSIDE tocheckAvailableMoves availableMovesOpposite"
+    IO.inspect(availableMovesOpposite)
+    availableMovesOpposite = checkAvailableMoves(color, squares)
+    IO.puts "after checkAvailableMovesOpposite availableMovesOpposite: "
     IO.inspect availableMovesOpposite
     %{game | availableMovesOpposite: availableMovesOpposite}
   end

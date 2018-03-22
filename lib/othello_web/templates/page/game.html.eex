@@ -1,12 +1,14 @@
+<h1 id="game-h1">Othello Game:  <%= @game %> <img src="/images/othello.jpg/" alt="Image not displayed" width="50px" height="50px"></h1>
+
 <nav role="navigation">
   <ul class="nav nav-pills pull-right">
     <li><a href="/">Go Back</a></li>
   </ul>
 </nav>
-<h1>Othello Game: <%= @game %></h1>
+
 <script>
-  window.g_name = "<%= @game %>";
-  window.user = "<%= @user %>"
+  window.game_name = "<%= @game %>";
+  window.user_name = "<%= @user %>"
 </script>
 <div class="container">
   <div class="row">

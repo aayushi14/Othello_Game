@@ -1,23 +1,26 @@
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 <script>
   function toJoin() {
-    let g_name = $("#g_name").val();
-    if (g_name === "") {
+    let game_name = $("#game_name").val();
+    if (game_name === "") {
       alert("Game name cannot be empty!");
       return;
     }
 
-    let user = $("#user").val();
-    if (user === "") {
+    let user_name = $("#user_name").val();
+    if (user_name === "") {
       alert("User name cannot be empty!");
       return;
     }
 
-    window.location.href = "/game/" + g_name + "?user=" + user;
+    window.location.href = "/game/" + game_name + "?user_name=" + user_name;
   }
 </script>
 
-<h1>Othello Game Room</h1>
-
+<h1 class="index-h1">Othello Game Room</h1>
+<img src="/images/othello.jpg/" alt="Image not displayed" width="50px" height="50px" />
+<br>
+<br>
 <div class="container">
   <%= for r <- @room do %>
     <div class="card">
@@ -29,22 +32,67 @@
       <div class="card-text" id="spectator"><%= Map.get(Map.get(@instances, r), :spectators) %></div>
       <div class="card-text">Status: Test</div>
 
-      <div class="card-text"><button id="join">Join</button></div>
+      <div class="card-text"><button type="button" class="btn btn-sm btn-outline-dark">Join</button></div>
     </div>
   <% end %>
   <br />
-</div>
-
-<div class="row">
-  <div class="col">
-    <h3>Join a Game</h3>
-    <p>To create a new game, pick an unused name.</p>
-    <p>To join an existing game, pick any name from above.</p>
-
-    <p>Enter your Name: <input id="user" type="text"/>
-    <p>Enter game name: <input id="g_name" type="text"></p>
-    <button id="game-button" onclick="toJoin()">Join Game</button></p>
-     <p id="game-output"></p>
-
+  <!-- Trigger/Open The Modal -->
+  <div class="card" id="new_game">
+    <div class="card-text">
+      <button id="new_game_btn" class="btn btn-dark btn-smn">New Game</button>
+    </div>
   </div>
 </div>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div style="text-align:right;" class="col-3">
+          <span>Enter your Name:</span>
+        </div>
+        <div style="text-align:left;" class="col-3">
+          <input id="user_name" type="text"/>
+        </div>
+      </div>
+      <div class="row"><br></div>
+      <div class="row justify-content-center">
+        <div style="text-align:right;" class="col-3">
+          <span>Enter the name of Game:</span>
+        </div>
+        <div style="text-align:left;" class="col-3">
+          <input id="game_name" type="text"/>
+        </div>
+      </div>
+      <div class="row"><br></div>
+      <div class="row">
+        <div class="col">
+          <button class="btn btn-dark btn-smn" onclick="toJoin()">Join Game</button></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- https://www.w3schools.com/howto/howto_css_modals.asp -->
+<script>
+  var modal = document.getElementById('myModal');
+  var btn = document.getElementById("new_game_btn");
+  var span = document.getElementsByClassName("close")[0];
+
+  btn.onclick = function() {
+    modal.style.display = "block";
+  }
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+</script>
