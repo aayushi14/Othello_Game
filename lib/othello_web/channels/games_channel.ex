@@ -30,19 +30,6 @@ defmodule OthelloWeb.GamesChannel do
     {:noreply, socket}
   end
 
-
-  # def handle_in("othello", %{"state" => state}, socket) do
-  #   name = socket.assigns[:name]
-  #   user  = socket.assigns[:user]
-  #   #game = Game.load(name)
-  #   game =  %{ name: name, host: user, state: state }
-  #   GameBackup.save(name, game)
-  #
-  #   broadcast socket, "othello", %{"game" => game}
-  #   {:reply, {:ok, %{}}, socket}
-  #   #{:reply, {:ok, %{"game" => game}}, socket}
-  # end
-
   def handle_in("tohandleClick", %{"id" => id}, socket) do
     game = GameBackup.load(socket.assigns[:name])
     game = Game.tohandleClick(game, id)
@@ -56,7 +43,11 @@ defmodule OthelloWeb.GamesChannel do
 
   def handle_in("tocheckAvailableMoves", %{"xWasNext" => xWasNext, "squares" => squares}, socket) do
     game = GameBackup.load(socket.assigns[:name])
-    game = Game.tocheckAvailableMoves(socket.assigns[:game], xWasNext, squares)
+    IO.puts "handle_in loaded game"
+    IO.inspect game
+    IO.puts "*******--------------------------------******"
+
+    game = Game.tocheckAvailableMoves(game, xWasNext, squares)
     GameBackup.save(socket.assigns[:name], game)
     socket = assign(socket, :game, game)
     {:reply, {:ok, %{"game" => game}}, socket}
@@ -65,7 +56,7 @@ defmodule OthelloWeb.GamesChannel do
 
   def handle_in("tocheckAvailableMovesOpposite", %{"notxWasNext" => notxWasNext, "squares" => squares}, socket) do
     game = GameBackup.load(socket.assigns[:name])
-    game = Game.tocheckAvailableMovesOpposite(socket.assigns[:game], notxWasNext, squares)
+    game = Game.tocheckAvailableMovesOpposite(game, notxWasNext, squares)
     GameBackup.save(socket.assigns[:name], game)
     socket = assign(socket, :game, game)
     {:reply, {:ok, %{"game" => game}}, socket}

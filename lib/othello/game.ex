@@ -335,12 +335,17 @@ defmodule Othello.Game do
     availableMoves = getmodifiedIndex_loop(squares, 0, color, [])
     IO.puts "tocheckAvailableMoves availableMoves: "
     IO.inspect availableMoves
+
+    IO.puts "TO CHECK AVAILABLE MOVES -- GAME!"
+    IO.inspect game
     %{game | availableMoves: availableMoves}
   end
 
   def tocheckAvailableMovesOpposite(game, color, squares) do
     IO.puts "INSIDE tocheckAvailableMovesOpposite"
     IO.inspect(squares)
+    IO.puts "OPP color"
+    IO.inspect color
     availableMovesOpposite = getmodifiedIndex_loop(squares, 0, color, [])
     IO.puts "tocheckAvailableMovesOpposite availableMovesOpposite: "
     IO.inspect availableMovesOpposite

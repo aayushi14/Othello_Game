@@ -80,13 +80,14 @@ class Othello extends React.Component {
     console.log("INSIDE render: ");
     let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
     console.log("winner: " + winner);
-    // this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
-    // console.log("availableMoves: " + this.state.availableMoves);
+    this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+    console.log("availableMoves: " + this.state.availableMoves);
 
-    // this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
-    // console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
+    this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
+    console.log(!this.state.xWasNext);
+    console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
 
-    // console.log("availableMoves length => " + this.state.availableMoves.length);
+    console.log("availableMoves length => " + this.state.availableMoves.length);
 
     if ((this.state.availableMoves.length === 0) && (this.state.availableMovesOpposite.length === 0)) {
       winner = this.state.xNumbers === this.state.oNumbers ? "XO" : this.state.xNumbers > this.state.oNumbers ? "X" : "O";
