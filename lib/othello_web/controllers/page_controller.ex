@@ -8,7 +8,7 @@ defmodule OthelloWeb.PageController do
   end
 
     def game(conn, params) do
-    render conn, "game.html", game: params["game"], user: params["user"]
+    render conn, "game.html", game: params["game"], user_name: params["user_name"]
   end
 
 end

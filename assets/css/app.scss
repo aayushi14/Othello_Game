@@ -4,11 +4,10 @@
 
 /* index.html settings */
 
-h1.index-h1, #game-h1 {
+#index-h1, #game-h1 {
   background-color: #000000;
   color: white;
   font-family: "Georgia", serif;
-  text-decoration: none;
 }
 
 #black_block {
@@ -59,7 +58,7 @@ h1.index-h1, #game-h1 {
     margin: auto;
     padding: 2%;
     border: 1px solid #888;
-    width: 30%; /* Could be more or less, depending on screen size */
+    width: 40%; /* Could be more or less, depending on screen size */
 }
 
 /* The Close Button */

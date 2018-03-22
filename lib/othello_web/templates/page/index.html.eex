@@ -17,9 +17,17 @@
   }
 </script>
 
-<h1 class="index-h1">Othello Game Room</h1>
-<img src="/images/othello.jpg/" alt="Image not displayed" width="50px" height="50px" />
-<br>
+<div class="row">
+  <div class="col">
+    <h1 id="game-h1">Othello Game Room</h1>
+  </div>
+  <nav role="navigation">
+    <ul class="nav nav-pills pull-right">
+      <li><a href="/"><img src="/images/othello.jpg/" alt="Help" width="50px" height="50px"></a></li>
+    </ul>
+  </nav>
+</div>
+
 <br>
 <div class="container">
   <%= for r <- @room do %>
@@ -32,67 +40,135 @@
       <div class="card-text" id="spectator"><%= Map.get(Map.get(@instances, r), :spectators) %></div>
       <div class="card-text">Status: Test</div>
 
-      <div class="card-text"><button type="button" class="btn btn-sm btn-outline-dark">Join</button></div>
+      <div class="card-text"><button type="button" class="btn btn-sm btn-outline-dark" onclick="toJoin()">Join</button></div>
     </div>
   <% end %>
   <br />
   <!-- Trigger/Open The Modal -->
   <div class="card" id="new_game">
     <div class="card-text">
-      <button id="new_game_btn" class="btn btn-dark btn-smn">New Game</button>
+      <button class="myBtn_multi btn btn-dark btn-lg">New Game</button>
+    </div>
+  </div>
+  <br>
+  <div class="card" id="help">
+    <div class="card-text">
+      <button class="myBtn_multi btn btn-info btn-lg">How to Play</button>
     </div>
   </div>
 </div>
 <!-- The Modal -->
-<div id="myModal" class="modal">
-
-  <!-- Modal content -->
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <div class="container">
-      <div class="row justify-content-center">
-        <div style="text-align:right;" class="col-3">
-          <span>Enter your Name:</span>
-        </div>
-        <div style="text-align:left;" class="col-3">
-          <input id="user_name" type="text"/>
-        </div>
+<div class="modal modal_multi" role="dialog">
+  <div class="modal-dialog modal-dialog-centered">
+    <!-- Modal content -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Enter Details</h4>
+        <span class="close close_multi">&times;</span>
       </div>
-      <div class="row"><br></div>
-      <div class="row justify-content-center">
-        <div style="text-align:right;" class="col-3">
-          <span>Enter the name of Game:</span>
-        </div>
-        <div style="text-align:left;" class="col-3">
-          <input id="game_name" type="text"/>
-        </div>
-      </div>
-      <div class="row"><br></div>
-      <div class="row">
-        <div class="col">
-          <button class="btn btn-dark btn-smn" onclick="toJoin()">Join Game</button></p>
+      <div class="modal-body">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div style="text-align:right;" class="col-4">
+              <span>Your Name:</span>
+            </div>
+            <div style="text-align:left;" class="col-4">
+              <input id="user_name" type="text"/>
+            </div>
+          </div>
+          <div class="row"><br></div>
+          <div class="row justify-content-center">
+            <div style="text-align:right;" class="col-4">
+              <span>Name your Game:</span>
+            </div>
+            <div style="text-align:left;" class="col-4">
+              <input id="game_name" type="text"/>
+            </div>
+          </div>
+          <div class="row"><br></div>
+          <div class="row">
+            <div class="col">
+              <button class="btn btn-dark btn-smn" onclick="toJoin()">Join Game</button></p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
 </div>
 
-<!-- https://www.w3schools.com/howto/howto_css_modals.asp -->
-<script>
-  var modal = document.getElementById('myModal');
-  var btn = document.getElementById("new_game_btn");
-  var span = document.getElementsByClassName("close")[0];
 
-  btn.onclick = function() {
-    modal.style.display = "block";
-  }
-  span.onclick = function() {
-    modal.style.display = "none";
-  }
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
+<!-- Modal -->
+<div class="modal modal_multi" role="dialog">
+  <div class="modal-dialog modal-dialog-centered">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">How to play</h4>
+        <span class="close close_multi">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p>The objective of the game is to capture more<br>
+          board squares than your opponent. You do this<br>
+          by changing your opponents pieces to your color.<br>
+          To capture your opponents pieces, place your<br>
+          pieces on either side of your opponents pieces.<br>
+          If you din't understand that,<br>
+          Just Play!! It easy enough ... :)
+        </p>
+      </div>
+      <div class="modal-body">
+        <p>Enjoy!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- http://w3schools.invisionzone.com/topic/55976-multiple-modal-boxes-on-webpage/ -->
+<script>
+    // Get the modal
+    var modalparent = document.getElementsByClassName("modal_multi");
+    // Get the button that opens the modal
+    var modal_btn_multi = document.getElementsByClassName("myBtn_multi");
+    // Get the <span> element that closes the modal
+    var span_close_multi = document.getElementsByClassName("close_multi");
+    // When the user clicks the button, open the modal
+    function setDataIndex() {
+        for (i = 0; i < modal_btn_multi.length; i++)
+        {
+            modal_btn_multi[i].setAttribute('data-index', i);
+            modalparent[i].setAttribute('data-index', i);
+            span_close_multi[i].setAttribute('data-index', i);
+        }
     }
-  }
+
+    for (i = 0; i < modal_btn_multi.length; i++)
+    {
+        modal_btn_multi[i].onclick = function() {
+            var ElementIndex = this.getAttribute('data-index');
+            modalparent[ElementIndex].style.display = "block";
+        };
+
+        // When the user clicks on <span> (x), close the modal
+        span_close_multi[i].onclick = function() {
+            var ElementIndex = this.getAttribute('data-index');
+            modalparent[ElementIndex].style.display = "none";
+        };
+
+    }
+
+    window.onload = function() {
+
+        setDataIndex();
+    };
+
+    window.onclick = function(event) {
+        if (event.target === modalparent[event.target.getAttribute('data-index')]) {
+            modalparent[event.target.getAttribute('data-index')].style.display = "none";
+        }
+        // OLD CODE
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
 </script>

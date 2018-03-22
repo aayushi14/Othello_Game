@@ -4,30 +4,33 @@ defmodule Othello.Game do
   # If it is first user, set it with black piece
   # If it is second user, set it with white piece
   # else add the user in the observer list
-  def join(game, user) do
+  def join(game, user_name) do
+    black_player = game.black_player
+    white_player = game.white_player
+    current_player = game.current_player
+    spectators = game.spectators
     cond do
       # if the user has already joined, return that game
-      game.black_player == user or game.white_player == user or Enum.member?(game.spectators, user) ->
+      black_player == user_name or white_player == user_name or Enum.member?(spectators, user_name) ->
         game
-      game.black_player == "" and game.white_player == "" ->
+      black_player == "" and white_player == "" ->
         if :rand.uniform(2) == 1 do
-          Map.put(game, :white_player, user)
+          white_player = user_name
         else
-          game
-          |> Map.put(:black_player, user)
-          |> Map.put(:current_player, user)
+          black_player = user_name
+          current_player = user_name
         end
-      game.black_player == "" or game.white_player == "" ->
-        if game.white_player == "" do
-          Map.put(game, :white_player, user)
+      black_player == "" or white_player == "" ->
+        if white_player == "" do
+          white_player = user_name
         else
-          game
-          |> Map.put(:black_player, user)
-          |> Map.put(:current_player, user)
+          black_player = user_name
+          current_player = user_name
         end
       true ->
-        Map.put(game, :spectators, List.insert_at(game.spectators, -1, user))
+        spectators = List.insert_at(game.spectators, -1, user_name)
     end
+    %{game | black_player: black_player, white_player: white_player, current_player: current_player, spectators: spectators}
   end
 
   @board_squares 0..63
@@ -333,9 +336,9 @@ defmodule Othello.Game do
     IO.puts "black_player"
     IO.inspect black_player
     IO.puts "white_player"
-    IO.inspect "white_player"
+    IO.inspect white_player
     IO.puts "current_player"
-    IO.inspect "current_player"
+    IO.inspect current_player
     IO.puts "*******************************"
 
     if current_player == black_player do
@@ -344,7 +347,7 @@ defmodule Othello.Game do
       current_player = black_player
     end
     IO.puts "current_player"
-    IO.inspect "current_player"
+    IO.inspect current_player
 
     %{game | squares: changedSquares, xNumbers: xNumbers, oNumbers: oNumbers, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor, current_player: current_player}
   end
