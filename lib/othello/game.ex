@@ -253,16 +253,6 @@ defmodule Othello.Game do
     modifiedBoard
   end
 
-  def getavailableMoves(squares, flipSquares) do
-    IO.puts "inside getavailableMoves>>>"
-    IO.inspect(squares)
-    squares
-    |> Enum.reduce([], fn(index, acc) -> [flipSquares.(index)] end)
-    |> Enum.reverse()
-#    modifiedBoard = flipSquares(squares, index, color)
-#    if modifiedBoard !== nil do:
-  end
-
   def getmodifiedIndex_loop(squares, index, color, listOfModifiedIndex) when is_integer(index) do
     IO.puts "inside getmodifiedIndex_loop index"
     IO.inspect index
