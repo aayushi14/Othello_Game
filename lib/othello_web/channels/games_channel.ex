@@ -4,24 +4,23 @@ defmodule OthelloWeb.GamesChannel do
   alias Othello.Game
   alias Othello.GameBackup
 
-  def join("games:" <> g_name, params, socket) do
+  def join("games:" <> game_name, params, socket) do
+    IO.inspect params
     IO.puts "INSIDE JOIN"
     # or the game has already started
     user = params["user"]
-    game = GameBackup.load(g_name) || Game.new()
-    IO.puts "squares length"
-    IO.inspect length(game.squares)
-    
-    IO.inspect game
+    IO.inspect user
 
+    IO.puts "*_*_*_*_*_*_"
+    game = GameBackup.load(game_name) || Game.new()
     game = Game.join(game, user)
 
-    GameBackup.save(g_name, game)
+    GameBackup.save(game_name, game)
     socket = socket
-      |> assign(:name, g_name)
+      |> assign(:name, game_name)
 
-    # send(self(), :after_join)
-    {:ok, %{"join" => g_name, "game" => Game.client_view(game)}, socket}
+    send(self(), :after_join)
+    {:ok, %{"join" => game_name, "game" => Game.client_view(game)}, socket}
   end
 
   def handle_info(:after_join, socket) do
@@ -37,8 +36,10 @@ defmodule OthelloWeb.GamesChannel do
     IO.inspect game
 
     GameBackup.save(socket.assigns[:name], game)
-    socket = assign(socket, :game, game)
-    {:reply, {:ok, %{"game" => game}}, socket}
+    #socket = assign(socket, :game, game)
+    #{:reply, {:ok, %{"game" => game}}, socket}
+    broadcast! socket, "tohandleClick", %{"game_state" => Game.client_view(game)}
+    {:noreply, socket}
   end
 
   def handle_in("tocheckAvailableMoves", %{"xWasNext" => xWasNext, "squares" => squares}, socket) do
@@ -49,8 +50,14 @@ defmodule OthelloWeb.GamesChannel do
 
     game = Game.tocheckAvailableMoves(game, xWasNext, squares)
     GameBackup.save(socket.assigns[:name], game)
+
+    IO.inspect game 
+
+    IO.puts "AFTER tocheckAvailableMoves"
     socket = assign(socket, :game, game)
     {:reply, {:ok, %{"game" => game}}, socket}
+    # broadcast! socket, "tocheckAvailableMoves", %{"game_state" => Game.client_view(game)}
+    # {:noreply, socket}
   end
 
 
@@ -58,15 +65,19 @@ defmodule OthelloWeb.GamesChannel do
     game = GameBackup.load(socket.assigns[:name])
     game = Game.tocheckAvailableMovesOpposite(game, notxWasNext, squares)
     GameBackup.save(socket.assigns[:name], game)
-    socket = assign(socket, :game, game)
-    {:reply, {:ok, %{"game" => game}}, socket}
+    # socket = assign(socket, :game, game)
+    # {:reply, {:ok, %{"game" => game}}, socket}
+    broadcast! socket, "tocheckAvailableMovesOpposite", %{"game_state" => Game.client_view(game)}
+    {:noreply, socket}
   end
 
   def handle_in("toReset", %{}, socket) do
     game = Game.new()
     GameBackup.save(socket.assigns[:name], game)
-    socket = assign(socket, :game, game)
-    {:reply, {:ok, %{"game" => game}}, socket}
+    # socket = assign(socket, :game, game)
+    # {:reply, {:ok, %{"game" => game}}, socket}
+    broadcast! socket, "toReset", %{"game_state" => Game.client_view(game)}
+    {:noreply, socket}
   end
 
 

@@ -2,48 +2,122 @@
 
 @import "bootstrap";
 
-p {
-  padding: 2px;
-  margin: 1px;
-  color: #000000;
-  font: 20px "Georgia", Futura, serif;
+/* index.html settings */
+
+#index-h1, #game-h1 {
+  background-color: #000000;
+  color: white;
+  font-family: "Georgia", serif;
 }
 
-button, .submit {
-    background-color: #000000;
-    padding: 10px 30px;
-    margin: 1px 1px;
-    width: 220px;
-    font: 20px "Georgia", Futura, serif;
-    color: #ebebf0;
+#black_block {
+  background-color: black;
+  color: white;
+}
+
+#white_block {
+  background-color: white;
+  color: black;
+  border-bottom: 2px solid black;
+}
+
+#spectator {
+  color: orange;
+  border-bottom: 2px solid black;
+}
+
+// #new_game {
+//   background-color: #EBEBF0;
+//   border: 5px dashed gray;
+// }
+ .btn {
+  width: 150px;
+ }
+
+.card {
+  // width: 20%;
+  margin-top: 10%;
+  display: inline-block;
+  border: 0px;
+}
+
+
+// https://www.w3schools.com/howto/howto_css_modals.asp
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 2%;
+    border: 1px solid #888;
+    width: 40%; /* Could be more or less, depending on screen size */
+}
+
+.modal-dialog {
+    max-width: 75%;
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 200%;
+    font-weight: bold;
+    margin-right: -100%;
+    margin-top: 15%;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
     cursor: pointer;
 }
 
-button:hover, .submit:hover {
-    background-color: #ebebf0;
-    color: #202020;
+#user_name, #game_name {
+  display: block;
+  width: 90%;
+  height: 80%;
+  padding: 10% 5%;
+  font-size: 100%;
+  background-color: #EBEBF0;
+  border: 1px solid #cccccc;
 }
 
-* {
-	box-sizing: border-box;
-}
+// button, .submit {
+//     background-color: #000066;
+//     padding: 10px 30px;
+//     margin: 1px 1px;
+//     width: 220px;
+//     font: 20px "Georgia", Futura, serif;
+//     color: #ebebf0;
+//     cursor: pointer;
+// }
+//
+// button:hover, .submit:hover {
+//   background-color: #ebebf0;
+//   color: #000066;
+// }
+
+/* Global settings */
 
 body {
 	font: 14px "Georgia", Futura, serif;
 	margin: 10px;
   margin-left: 100px;
-}
-
-.players {
-	margin-left: 450px;
-	margin-top: -200px;
-}
-
-h1 {
-  text-align: center;
-  color: #000000;
-  font-family: Georgia;
-  text-decoration: underline;
 }
 
 ol, ul {
@@ -56,6 +130,14 @@ ol, ul {
   text-align: center;
 }
 
+/* Main game page settings */
+
+.players {
+	margin-left: 450px;
+	margin-top: -200px;
+}
+
+// othello board
 .board {
     border: 3px solid black;
     padding: 10px;
@@ -72,6 +154,7 @@ ol, ul {
 	margin-bottom: 10px;
 }
 
+// 0..63 squares of the board
 .square {
 	background: #1a7f25;
 	border: 1px solid #111111;
@@ -122,6 +205,7 @@ ol, ul {
 	cursor: not-allowed;
 }
 
+// stubs on the square
 .marker {
 	width: 80%;
 	height: 80%;
@@ -130,10 +214,12 @@ ol, ul {
 	margin-top: 10%;
 }
 
+// stub for the black player
 .marker.black {
 	background: #111;
 }
 
+// stub for the white player
 .marker.white {
 	background: #eee;
 	border: 1px solid #111;
@@ -153,4 +239,17 @@ ol, ul {
   background-color: white;
   color: black;
   font-size: 150%;
+}
+
+// Remove the space between the columns in bootstrap
+// https://getbootstrap.com/docs/4.0/layout/grid/
+.no-gutters {
+  margin-right: 0;
+  margin-left: 0;
+
+  > .col,
+  > [class*="col-"] {
+    padding-right: 0;
+    padding-left: 0;
+  }
 }

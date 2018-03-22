@@ -23,16 +23,16 @@ class Othello extends React.Component {
       oNumbers: 2,                              // number of white color pieces
       xWasNext: true,
       xIsNext: true,
-      availableMoves: [20, 29, 34, 43],         // the available moves for black player (current)
-      availableMovesOpposite: [19, 26, 37, 44], // the available moves for white player
+      availableMoves: [],         // the available moves for black player (current)
+      availableMovesOpposite: [], // the available moves for white player
       black_player: "",                         // name of the player with black colored pieces
       white_player: "",                         // name of the player with white colored pieces
       spectators: [],                           // the list of spectators
       current_player: "",                       // black player moves first
     };
 
-    this.channel.on("tocheckAvailableMoves", this.checkAvailableMoves);
-    this.channel.on("tocheckAvailableMovesOpposite", this.checkAvailableMovesOpposite);
+    // this.channel.on("tocheckAvailableMoves", this.checkAvailableMoves);
+    // this.channel.on("tocheckAvailableMovesOpposite", this.checkAvailableMovesOpposite);
 
     this.channel.on("join", payload => {
       let game_state = payload.game_state;
@@ -76,11 +76,21 @@ class Othello extends React.Component {
     this.channel.push("tocheckAvailableMovesOpposite", {notxWasNext: notxWasNext, squares: squares});
   }
 
+  componentWillMount() {
+    if(this.state.black_player == this.state.current_player ) {
+    this.channel.push("tocheckAvailableMoves", {xWasNext: this.state.xWasNext, squares: this.state.squares})
+    .receive("ok", this.gotView.bind(this)); 
+    } else if (this.state.white_player == this.state.current_player ){
+    this.channel.push("tocheckAvailableMoves", {xWasNext: !this.state.xWasNext, squares: this.state.squares})
+    .receive("ok", this.gotView.bind(this)); 
+    }
+  }
+
   render() {
     console.log("INSIDE render: ");
     let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
     console.log("winner: " + winner);
-    this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+    // this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
     console.log("availableMoves: " + this.state.availableMoves);
 
     this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
@@ -97,7 +107,7 @@ class Othello extends React.Component {
       	winner ?
       		(winner === "XO") ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') :
       		[this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
- 
+
 
 
     let black_player_status = "";

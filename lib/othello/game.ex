@@ -4,30 +4,36 @@ defmodule Othello.Game do
   # If it is first user, set it with black piece
   # If it is second user, set it with white piece
   # else add the user in the observer list
-  def join(game, user) do
+  def join(game, user_name) do
+    IO.puts "INSIDE JOIN"
+    IO.inspect user_name
+    IO.puts "----------"
+    black_player = game.black_player
+    white_player = game.white_player
+    current_player = game.current_player
+    spectators = game.spectators
     cond do
       # if the user has already joined, return that game
-      game.black_player == user or game.white_player == user or Enum.member?(game.spectators, user) ->
+      black_player == user_name or white_player == user_name or Enum.member?(spectators, user_name) ->
         game
-      game.black_player == "" and game.white_player == "" ->
+      black_player == "" and white_player == "" ->
         if :rand.uniform(2) == 1 do
-          Map.put(game, :white_player, user)
+          white_player = user_name
         else
-          game
-          |> Map.put(:black_player, user)
-          |> Map.put(:current_player, user)
+          black_player = user_name
+          current_player = user_name
         end
-      game.black_player == "" or game.white_player == "" ->
-        if game.white_player == "" do
-          Map.put(game, :white_player, user)
+      black_player == "" or white_player == "" ->
+        if white_player == "" do
+          white_player = user_name
         else
-          game
-          |> Map.put(:black_player, user)
-          |> Map.put(:current_player, user)
+          black_player = user_name
+          current_player = user_name
         end
       true ->
-        Map.put(game, :spectators, List.insert_at(game.spectators, -1, user))
+        spectators = List.insert_at(game.spectators, -1, user_name)
     end
+    %{game | black_player: black_player, white_player: white_player, current_player: current_player, spectators: spectators}
   end
 
   @board_squares 0..63
@@ -50,8 +56,8 @@ defmodule Othello.Game do
       oNumbers: 2,
       xWasNext: true,
       xIsNext: true,
-      availableMoves: [20, 29, 34, 43],
-      availableMovesOpposite: [19, 26, 37, 44],
+      availableMoves: [],
+      availableMovesOpposite: [],
       black_player: "",
       white_player: "",
       spectators: [],
@@ -250,16 +256,6 @@ defmodule Othello.Game do
     modifiedBoard
   end
 
-  def getavailableMoves(squares, flipSquares) do
-    IO.puts "inside getavailableMoves>>>"
-    IO.inspect(squares)
-    squares
-    |> Enum.reduce([], fn(index, acc) -> [flipSquares.(index)] end)
-    |> Enum.reverse()
-#    modifiedBoard = flipSquares(squares, index, color)
-#    if modifiedBoard !== nil do:
-  end
-
   def getmodifiedIndex_loop(squares, index, color, listOfModifiedIndex) when is_integer(index) do
     IO.puts "inside getmodifiedIndex_loop index"
     IO.inspect index
@@ -293,10 +289,10 @@ defmodule Othello.Game do
   def checkAvailableMoves(color, squares) do
     IO.puts "============INSIDE checkAvailableMoves============"
     IO.inspect(squares)
-    availableMoves = getmodifiedIndex_loop(squares, 0, color, [])
-    IO.puts "availableSquares: "
-    IO.inspect availableMoves
-    availableMoves
+    modifiedSquares = getmodifiedIndex_loop(squares, 0, color, [])
+    IO.puts "modifiedSquares: "
+    IO.inspect modifiedSquares
+    modifiedSquares
   end
 
   def tohandleClick(game, id) do
@@ -307,6 +303,9 @@ defmodule Othello.Game do
     oNumbers = game.oNumbers
     xWasNext = game.xWasNext
     xIsNext = game.xIsNext
+    black_player = game.black_player
+    white_player = game.white_player
+    current_player= game.current_player
 
     if calculateWinner(xNumbers, oNumbers) || Enum.at(squares,id) do
       IO.puts "tohandleClick calculateWinner"
@@ -321,19 +320,44 @@ defmodule Othello.Game do
         IO.puts "else, if, else, tohandleClick"
         xNumbers = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "X", do: acc + 1, else: acc) end)
         oNumbers = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "O", do: acc + 1, else: acc) end)
-        shouldTurnColor = if length(checkAvailableMoves(!xIsNext, changedSquares)) > 0, do: !xIsNext, else: xIsNext
+        IO.puts "123 xIsNext"
+        IO.inspect xIsNext
+        modifiedSquares = checkAvailableMoves( !xIsNext, changedSquares)
+        shouldTurnColor = if length(modifiedSquares) > 0, do: !xIsNext, else: xIsNext
+        IO.puts "modifiedSquares"
+        IO.inspect modifiedSquares
         IO.puts "shouldTurnColor"
         IO.inspect shouldTurnColor
       end
     end
-    %{game | squares: changedSquares, xNumbers: xNumbers, oNumbers: oNumbers, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor}
+
+    IO.puts "black_player"
+    IO.inspect black_player
+    IO.puts "white_player"
+    IO.inspect white_player
+    IO.puts "current_player"
+    IO.inspect current_player
+    IO.puts "*******************************"
+
+    if current_player == black_player do
+      current_player = white_player
+    else
+      current_player = black_player
+    end
+    IO.puts "current_player"
+    IO.inspect current_player
+
+    %{game | squares: changedSquares, xNumbers: xNumbers, oNumbers: oNumbers, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor, current_player: current_player}
   end
 
   def tocheckAvailableMoves(game, color, squares) do
-    IO.puts "INSIDE tocheckAvailableMoves"
+    availableMoves = game.availableMoves
+    IO.puts "INSIDE tocheckAvailableMoves squares"
     IO.inspect(squares)
-    availableMoves = getmodifiedIndex_loop(squares, 0, color, [])
-    IO.puts "tocheckAvailableMoves availableMoves: "
+    IO.puts "INSIDE tocheckAvailableMoves availableMoves"
+    IO.inspect(availableMoves)
+    availableMoves = checkAvailableMoves(color, squares)
+    IO.puts "after checkAvailableMoves availableMoves: "
     IO.inspect availableMoves
 
     IO.puts "TO CHECK AVAILABLE MOVES -- GAME!"
@@ -342,57 +366,15 @@ defmodule Othello.Game do
   end
 
   def tocheckAvailableMovesOpposite(game, color, squares) do
-    IO.puts "INSIDE tocheckAvailableMovesOpposite"
+    availableMovesOpposite = game.availableMovesOpposite
+    IO.puts "INSIDE tocheckAvailableMovesOpposite squares"
     IO.inspect(squares)
-    IO.puts "OPP color"
-    IO.inspect color
-    availableMovesOpposite = getmodifiedIndex_loop(squares, 0, color, [])
-    IO.puts "tocheckAvailableMovesOpposite availableMovesOpposite: "
+    IO.puts "INSIDE tocheckAvailableMoves availableMovesOpposite"
+    IO.inspect(availableMovesOpposite)
+    availableMovesOpposite = checkAvailableMoves(color, squares)
+    IO.puts "after checkAvailableMovesOpposite availableMovesOpposite: "
     IO.inspect availableMovesOpposite
     %{game | availableMovesOpposite: availableMovesOpposite}
   end
-
-
-  # def inRender(game) do
-  #   IO.puts "inRender game-----------"
-  #   IO.inspect(game)
-  #   squares = game.squares
-  #   xNumbers = game.xNumbers
-  #   oNumbers = game.oNumbers
-  #   xWasNext = game.xWasNext
-  #   xIsNext = game.xIsNext
-  #   availableMoves = game.availableMoves
-  #   availableMovesOpposite = game.availableMovesOpposite
-  #
-  #   initSquares = initSq()
-  #   IO.puts "----inRender----"
-  #
-  #   winner = calculateWinner(xNumbers, oNumbers);
-  #   availableMoves = checkAvailableMoves(xWasNext, squares)
-  #   availableMovesOpposite = checkAvailableMoves(!xWasNext, squares)
-  #
-  #   if (length(availableMoves) == 0 && length(availableMovesOpposite) == 0) do
-  #     IO.puts "before winner"
-  #     winner = cond do
-  #               xNumbers === oNumbers -> "XO"
-  #               xNumbers > oNumbers -> "X"
-  #               true -> "O"
-  #             end
-  #     IO.puts "after winner"
-  #     IO.inspect winner
-  #   end
-  #
-  #   status = if(winner) do
-  #             cond do
-  #               winner == "XO" -> 'It\'s a draw'
-  #               winner == "X" -> 'The winner is White!'
-  #               winner == "O" -> 'The winner is Black!'
-  #               xIsNext -> 'Black\'s turn with ' + length(availableMoves) + ' available moves.'
-  #               true -> 'White\'s turn with ' + length(availableMoves) + ' available moves.'
-  #             end
-  #           end
-  #
-  #   %{game | availableMoves: availableMoves, availableMovesOpposite: availableMovesOpposite}
-  # end
 
 end

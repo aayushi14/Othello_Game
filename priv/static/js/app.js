@@ -31745,7 +31745,7 @@ function start() {
   var root = document.getElementById('root');
 
   if (root) {
-    var channel = _socket2.default.channel("games:" + window.g_name, { "user": window.user });
+    var channel = _socket2.default.channel("games:" + window.game_name, { "user": window.user_name });
     (0, _othello2.default)(root, channel);
   }
 } // Brunch automatically concatenates all files in your
@@ -31907,16 +31907,16 @@ var Othello = function (_React$Component) {
       oNumbers: 2, // number of white color pieces
       xWasNext: true,
       xIsNext: true,
-      availableMoves: [20, 29, 34, 43], // the available moves for black player (current)
-      availableMovesOpposite: [19, 26, 37, 44], // the available moves for white player
+      availableMoves: [], // the available moves for black player (current)
+      availableMovesOpposite: [], // the available moves for white player
       black_player: "", // name of the player with black colored pieces
       white_player: "", // name of the player with white colored pieces
       spectators: [], // the list of spectators
       current_player: "" // black player moves first
     };
 
-    _this.channel.on("tocheckAvailableMoves", _this.checkAvailableMoves);
-    _this.channel.on("tocheckAvailableMovesOpposite", _this.checkAvailableMovesOpposite);
+    // this.channel.on("tocheckAvailableMoves", this.checkAvailableMoves);
+    // this.channel.on("tocheckAvailableMovesOpposite", this.checkAvailableMovesOpposite);
 
     _this.channel.on("join", function (payload) {
       var game_state = payload.game_state;
@@ -31965,6 +31965,15 @@ var Othello = function (_React$Component) {
       this.channel.push("tocheckAvailableMovesOpposite", { notxWasNext: notxWasNext, squares: squares });
     }
   }, {
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      if (this.state.black_player == this.state.current_player) {
+        this.channel.push("tocheckAvailableMoves", { xWasNext: this.state.xWasNext, squares: this.state.squares }).receive("ok", this.gotView.bind(this));
+      } else if (this.state.white_player == this.state.current_player) {
+        this.channel.push("tocheckAvailableMoves", { xWasNext: !this.state.xWasNext, squares: this.state.squares }).receive("ok", this.gotView.bind(this));
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _this2 = this;
@@ -31972,7 +31981,7 @@ var Othello = function (_React$Component) {
       console.log("INSIDE render: ");
       var winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
       console.log("winner: " + winner);
-      this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+      // this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
       console.log("availableMoves: " + this.state.availableMoves);
 
       this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
