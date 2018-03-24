@@ -40,10 +40,9 @@ defmodule OthelloWeb.GamesChannel do
     socket = assign(socket, :game, game)
     IO.inspect socket
 
-    {:reply, {:ok, %{"game" => game}}, socket}
+    broadcast socket, "tohandleClick", %{"game_state" => game}
 
-    # broadcast! socket, "tohandleClick", %{"game_state" => Game.client_view(game)}
-    # {:noreply, socket}
+    {:noreply, socket}
   end
 
   def handle_in("tocheckAvailableMoves", %{"xWasNext" => xWasNext, "squares" => squares}, socket) do
@@ -55,13 +54,13 @@ defmodule OthelloWeb.GamesChannel do
     game = Game.tocheckAvailableMoves(game, xWasNext, squares)
     GameBackup.save(socket.assigns[:name], game)
 
-    IO.inspect game 
+    IO.inspect game
 
     IO.puts "AFTER tocheckAvailableMoves"
     socket = assign(socket, :game, game)
-    {:reply, {:ok, %{"game" => game}}, socket}
-    # broadcast! socket, "tocheckAvailableMoves", %{"game_state" => Game.client_view(game)}
-    # {:noreply, socket}
+
+    broadcast socket, "tocheckAvailableMoves", %{"game_state" => game}
+    {:noreply, socket}
   end
 
 
@@ -69,24 +68,19 @@ defmodule OthelloWeb.GamesChannel do
     game = GameBackup.load(socket.assigns[:name])
     game = Game.tocheckAvailableMovesOpposite(game, notxWasNext, squares)
     GameBackup.save(socket.assigns[:name], game)
-    # socket = assign(socket, :game, game)
-    # {:reply, {:ok, %{"game" => game}}, socket}
-    broadcast! socket, "tocheckAvailableMovesOpposite", %{"game_state" => Game.client_view(game)}
+    socket = assign(socket, :game, game)
+
+    broadcast socket, "tocheckAvailableMovesOpposite", %{"game_state" => game}
     {:noreply, socket}
   end
 
   def handle_in("toReset", %{}, socket) do
     game = Game.new()
     GameBackup.save(socket.assigns[:name], game)
-    # socket = assign(socket, :game, game)
-    # {:reply, {:ok, %{"game" => game}}, socket}
-    broadcast! socket, "toReset", %{"game_state" => Game.client_view(game)}
+    socket = assign(socket, :game, game)
+
+    broadcast socket, "toReset", %{"game_state" => game}
     {:noreply, socket}
   end
 
-
-  # Add authorization logic here as required.
-  defp authorized?(_payload) do
-    true
-  end
 end

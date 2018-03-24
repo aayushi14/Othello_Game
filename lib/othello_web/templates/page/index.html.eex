@@ -33,12 +33,12 @@
   <%= for r <- @room do %>
     <div class="card">
       <div class="card-header">Game: <%= r %></div>
-      <div class="card-text" id="black_block"><%= Map.get(Map.get(@instances, r), :blackPlayer) %></div>
-      <div class="card-text" id="black_block"><%= Map.get(Map.get(@instances, r), :blackPieces) %> pieces</div>
-      <div class="card-text"><%= Map.get(Map.get(@instances, r), :whitePlayer) %></div>
-      <div class="card-text" id="white_block"><%= Map.get(Map.get(@instances, r), :whitePiece) %> pieces</div>
+      <div class="card-text" id="black_block"><%= Map.get(Map.get(@instances, r), :black_player) %></div>
+      <div class="card-text" id="black_block"><%= Map.get(Map.get(@instances, r), :xNumbers) %> pieces</div>
+      <div class="card-text"><%= Map.get(Map.get(@instances, r), :white_player) %></div>
+      <div class="card-text" id="white_block"><%= Map.get(Map.get(@instances, r), :oNumbers) %> pieces</div>
       <div class="card-text" id="spectator"><%= Map.get(Map.get(@instances, r), :spectators) %></div>
-      <div class="card-text">Status: Test</div>
+      <div class="card-text">Status: Open</div>
 
       <div class="card-text"><button type="button" class="btn btn-sm btn-outline-dark" onclick="toJoin()">Join</button></div>
     </div>
@@ -50,7 +50,6 @@
       <button class="myBtn_multi btn btn-dark btn-lg">New Game</button>
     </div>
   </div>
-  <br>
   <div class="card" id="help">
     <div class="card-text">
       <button class="myBtn_multi btn btn-info btn-lg">How to Play</button>
@@ -69,19 +68,19 @@
       <div class="modal-body">
         <div class="container">
           <div class="row justify-content-center">
-            <div style="text-align:right;" class="col-5">
+            <div style="text-align:right;" class="col-6">
               <span>Your Name:</span>
             </div>
-            <div style="text-align:left;" class="col-5">
+            <div style="text-align:left;" class="col-6">
               <input id="user_name" type="text"/>
             </div>
           </div>
           <div class="row"><br></div>
           <div class="row justify-content-center">
-            <div style="text-align:right;" class="col-5">
+            <div style="text-align:right;" class="col-6">
               <span>Name your Game:</span>
             </div>
-            <div style="text-align:left;" class="col-5">
+            <div style="text-align:left;" class="col-6">
               <input id="game_name" type="text"/>
             </div>
           </div>

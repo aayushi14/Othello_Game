@@ -31,9 +31,6 @@ class Othello extends React.Component {
       current_player: "",                       // black player moves first
     };
 
-    // this.channel.on("tocheckAvailableMoves", this.checkAvailableMoves);
-    // this.channel.on("tocheckAvailableMovesOpposite", this.checkAvailableMovesOpposite);
-
     this.channel.on("join", payload => {
       let game_state = payload.game_state;
       console.log("state after joining");
@@ -43,7 +40,16 @@ class Othello extends React.Component {
 
     this.channel.join()
       .receive("ok", this.gotView.bind(this))
-      .receive("error", resp => { console.log("Unable to join", resp) });
+      .receive("error", resp => { console.log("Unable to join", resp)
+    });
+  }
+
+  componentDidMount() {
+    this.channel.on("tohandleClick", payload => {
+      let game_state = payload.game_state;
+      this.setState(game_state);
+    });
+    
   }
 
   gotView(view) {
@@ -81,10 +87,10 @@ class Othello extends React.Component {
   componentWillMount() {
     if(this.state.black_player == this.state.current_player ) {
     this.channel.push("tocheckAvailableMoves", {xWasNext: this.state.xWasNext, squares: this.state.squares})
-    .receive("ok", this.gotView.bind(this)); 
+    .receive("ok", this.gotView.bind(this));
     } else if (this.state.white_player == this.state.current_player ){
     this.channel.push("tocheckAvailableMoves", {xWasNext: !this.state.xWasNext, squares: this.state.squares})
-    .receive("ok", this.gotView.bind(this)); 
+    .receive("ok", this.gotView.bind(this));
     }
   }
 

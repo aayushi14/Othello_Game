@@ -189,7 +189,7 @@ defmodule Othello.Game do
       -1 -> offset = -7
       -7 -> offset = -8
       -8 -> offset = -9
-      _ -> offset = :ok
+      _ -> offset = "ok"
     end
     offset
   end
@@ -208,7 +208,7 @@ defmodule Othello.Game do
       offset = setOffset(offset)
       IO.puts "offset: "
       IO.inspect offset
-      if offset != :ok do
+      if offset != "ok" do
         y = position + offset
         IO.puts "inside offset check:            flippedSquares:"
         IO.inspect flippedSquares
@@ -236,6 +236,9 @@ defmodule Othello.Game do
 
     IO.puts "squares in flipSquares: "
     IO.inspect squares
+
+    IO.puts "position in flipSquares: "
+    IO.inspect position
 
     IO.puts "Enum.at(squares, position):"
     IO.inspect Enum.at(squares, position)
@@ -277,10 +280,16 @@ defmodule Othello.Game do
     IO.inspect squares
     IO.puts "inside ingetmodifiedIndex_loop modifiedBoard"
     IO.inspect modifiedBoard
-    if modifiedBoard != nil do 
+    if modifiedBoard != nil do
       if Enum.at(modifiedBoard, index) != nil do
         listOfModifiedIndex = listOfModifiedIndex ++ [index]
+        IO.puts "check here: listOfModifiedIndex "
+        IO.inspect listOfModifiedIndex
+      else
+        listOfModifiedIndex
       end
+    else
+      listOfModifiedIndex
     end
       IO.puts "inside ingetmodifiedIndex_loop listOfModifiedIndex"
       IO.inspect listOfModifiedIndex
@@ -291,13 +300,6 @@ defmodule Othello.Game do
   def checkAvailableMoves(color, squares) do
     IO.puts "============INSIDE checkAvailableMoves============"
     IO.inspect(squares)
-
-    IO.inspect flipSquares(squares, 9, color)      
-    IO.inspect flipSquares(squares, 20, color)
-    IO.inspect flipSquares(squares, 27, color)
-    IO.inspect flipSquares(squares, 34, color)
-    IO.inspect flipSquares(squares, 42, color)
-    IO.inspect flipSquares(squares, 62, color)
 
     modifiedSquares = getmodifiedIndex_loop(squares, 0, color, [])
     IO.puts "modifiedSquares: "
