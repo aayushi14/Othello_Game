@@ -6113,9 +6113,7 @@ a.text-dark:hover, a.text-dark:focus {
 
 /* Global settings */
 body {
-  font: 14px "Georgia", Futura, serif;
-  margin: 10px;
-  margin-left: 100px; }
+  font: 14px "Georgia", Futura, serif; }
 
 ol, ul {
   padding-left: 30px; }

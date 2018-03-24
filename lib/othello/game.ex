@@ -112,10 +112,10 @@ defmodule Othello.Game do
   def for_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when is_integer(y) do
     IO.puts "INSIDE for_loop: y-------- "
     IO.inspect y
-    modifiedBoard = infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
-    IO.puts "modifiedBoard for_loop: "
-    IO.inspect modifiedBoard
-    modifiedBoard
+    flippedSquares = infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
+    IO.puts "flippedSquares for_loop: "
+    IO.inspect flippedSquares
+    flippedSquares
   end
 
   defp infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when y >= 64, do: modifiedBoard
@@ -131,9 +131,9 @@ defmodule Othello.Game do
 
     # Fix when board is breaking into a new row or col
     if (abs(lastXpos - xPos) > 1 || abs(lastYpos - yPos) > 1) do
-      IO.puts "FIX board modifiedBoard: "
-      IO.inspect modifiedBoard
-      modifiedBoard
+      IO.puts "FIX board flippedSquares: "
+      IO.inspect flippedSquares
+      flippedSquares
     else
       IO.puts "else of FIX board flippedSquares: "
       IO.inspect flippedSquares
@@ -157,7 +157,7 @@ defmodule Othello.Game do
           IO.puts "first cond calling for_loop, y and offset:"
           IO.inspect y
           IO.inspect offset
-          modifiedBoard = for_loop(y + offset, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
+          flippedSquares = for_loop(y + offset, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
         # Next square was occupied with the same color
         (Enum.at(flippedSquares,y) === (if xIsNext, do: "X", else: "O")) && atleastOneMarkIsFlipped ->
           sq = if xIsNext, do: "X", else: "O"
@@ -167,16 +167,16 @@ defmodule Othello.Game do
           IO.puts "inside same color flippedSquares: "
           IO.inspect flippedSquares
           modifiedBoard = flippedSquares
-          modifiedBoard = foreach_loop(offset, squares, position, xIsNext, modifiedBoard, startX, startY)
-          modifiedBoard
+          flippedSquares = foreach_loop(offset, squares, position, xIsNext, modifiedBoard, startX, startY)
+          flippedSquares
         true ->
           IO.puts "true offset: "
           IO.inspect offset
-          modifiedBoard = foreach_loop(offset, squares, position, xIsNext, modifiedBoard, startX, startY)
-          modifiedBoard
+          flippedSquares = foreach_loop(offset, squares, position, xIsNext, modifiedBoard, startX, startY)
+          flippedSquares
       end
     end
-    modifiedBoard
+    flippedSquares
   end
 
   def setOffset(offset) do
@@ -210,18 +210,18 @@ defmodule Othello.Game do
       IO.inspect offset
       if offset != :ok do
         y = position + offset
-        IO.puts "inside offset check:            modifiedBoard:"
-        IO.inspect modifiedBoard
-        modifiedBoard = for_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
-        modifiedBoard
+        IO.puts "inside offset check:            flippedSquares:"
+        IO.inspect flippedSquares
+        flippedSquares = for_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
+        flippedSquares
       else
-        modifiedBoard
+        flippedSquares
       end
 
-      IO.puts "ending foreach_loop modifiedBoard "
-      IO.inspect modifiedBoard
+      IO.puts "ending foreach_loop flippedSquares "
+      IO.inspect flippedSquares
     # end
-    modifiedBoard
+    flippedSquares
   end
 
 
@@ -277,18 +277,28 @@ defmodule Othello.Game do
     IO.inspect squares
     IO.puts "inside ingetmodifiedIndex_loop modifiedBoard"
     IO.inspect modifiedBoard
-    if Enum.at(squares, index) != nil do
-      listOfModifiedIndex = listOfModifiedIndex ++ [index]
+    if modifiedBoard != nil do 
+      if Enum.at(modifiedBoard, index) != nil do
+        listOfModifiedIndex = listOfModifiedIndex ++ [index]
+      end
     end
-    IO.puts "inside ingetmodifiedIndex_loop listOfModifiedIndex"
-    IO.inspect listOfModifiedIndex
-    listOfModifiedIndex = ingetmodifiedIndex_loop(squares, index + 1, color, listOfModifiedIndex)
-    listOfModifiedIndex
+      IO.puts "inside ingetmodifiedIndex_loop listOfModifiedIndex"
+      IO.inspect listOfModifiedIndex
+      listOfModifiedIndex = ingetmodifiedIndex_loop(squares, index + 1, color, listOfModifiedIndex)
+      listOfModifiedIndex
   end
 
   def checkAvailableMoves(color, squares) do
     IO.puts "============INSIDE checkAvailableMoves============"
     IO.inspect(squares)
+
+    IO.inspect flipSquares(squares, 9, color)      
+    IO.inspect flipSquares(squares, 20, color)
+    IO.inspect flipSquares(squares, 27, color)
+    IO.inspect flipSquares(squares, 34, color)
+    IO.inspect flipSquares(squares, 42, color)
+    IO.inspect flipSquares(squares, 62, color)
+
     modifiedSquares = getmodifiedIndex_loop(squares, 0, color, [])
     IO.puts "modifiedSquares: "
     IO.inspect modifiedSquares

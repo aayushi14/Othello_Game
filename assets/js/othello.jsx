@@ -90,7 +90,7 @@ class Othello extends React.Component {
     console.log("INSIDE render: ");
     let winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
     console.log("winner: " + winner);
-    // this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
+    this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
     console.log("availableMoves: " + this.state.availableMoves);
 
     this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
