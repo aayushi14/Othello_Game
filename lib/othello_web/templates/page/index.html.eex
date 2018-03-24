@@ -17,17 +17,9 @@
   }
 </script>
 
-<div class="row">
-  <div class="col">
-    <h1 id="game-h1">Othello Game Room</h1>
-  </div>
-  <nav role="navigation">
-    <ul class="nav nav-pills justify-content-end">
-      <li><a href="/">Go Back</a></li>
-    </ul>
-  </nav>
-</div>
-
+<nav class="navbar fixed-top navbar-dark bg-dark justify-content-center" role="navigation">
+  <h1 class="navbar-brand disabled">Othello Game Room</h1>
+</nav>
 <br>
 <div class="container">
   <%= for r <- @room do %>

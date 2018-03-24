@@ -3,17 +3,17 @@
   window.user_name = "<%= @user_name %>";
 </script>
 
+<nav class="navbar fixed-top navbar-dark bg-dark justify-content-center" role="navigation">
+  <h1 class="navbar-brand disabled">Othello Game:  <%= @game %></h1>
+</nav>
+<br>
+<br>
+<br>
+<nav class="navbar justify-content-end" role="navigation">
+  <a href="/" class="pull-right ng-scope">Go Back</a>
+</nav>
+<br>
 <div class="row">
-  <div class="col">
-    <nav role="navigation">
-      <h1 id="game-h1">Othello Game:  <%= @game %></h1>
-      <ul class="nav nav-pills" class="navbar navbar-fixed-top navbar-light bg-light justify-content-end">
-        <li><a href="/">Go Back</a></li>
-      </ul>
-    </nav>
-  </div> 
-</div>
-
 <div class="container">
   <div class="row">
     <div class="col">
@@ -24,4 +24,5 @@
       </div>
     </div>
   </div>
+</div>
 </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Board from './board.jsx';
+import { Button } from 'reactstrap';
 
 export default function game_init(root, channel) {
   ReactDOM.render(<Othello channel={channel} />, root);
@@ -23,8 +24,8 @@ class Othello extends React.Component {
       oNumbers: 2,                              // number of white color pieces
       xWasNext: true,
       xIsNext: true,
-      availableMoves: [],         // the available moves for black player (current)
-      availableMovesOpposite: [], // the available moves for white player
+      availableMoves: [],                       // the available moves for black player (current)
+      availableMovesOpposite: [],               // the available moves for white player
       black_player: "",                         // name of the player with black colored pieces
       white_player: "",                         // name of the player with white colored pieces
       spectators: [],                           // the list of spectators
@@ -49,7 +50,7 @@ class Othello extends React.Component {
       let game_state = payload.game_state;
       this.setState(game_state);
     });
-    
+
   }
 
   gotView(view) {
@@ -135,62 +136,56 @@ class Othello extends React.Component {
       <div className="game">
         <div className="container">
           <div className="row justify-content-md-center">
-            <div className="col">
 
+            <div className="col">
               <div className="container">
                 <div className="row align-items-start">
-                  <div className="col">
-                    <div className="container">
-                      <div className="row align-items-start">
-                        <div className="col" id="black_side">BLACK</div>
-                      </div>
-                      <div className="row align-items-start">
-                        <div className="col" id="notice">{ this.state.black_player }</div>
-                      </div>
-                      <div className="row align-items-start">
-                        <div className="col" id="black_side">{ black_player_status }</div>
-                      </div>
-                    </div>
-                  </div>
+                  <div className="col" id="black_side">BLACK</div>
+                </div>
+                <div className="row align-items-start">
+                  <div className="col" id="notice">{ this.state.black_player }</div>
+                </div>
+                <div className="row align-items-start">
+                  <div className="col" id="black_side">{ black_player_status }</div>
                 </div>
                 <div><br /><br /><br /></div>
                 <div className="row align-items-end">
-                  <div className="col">
-                    <div className="container">
-                      <div className="row">
-                        <div className="col" id="white_side">WHITE</div>
-                      </div>
-                      <div className="row">
-                        <div className="col" id="message">{ this.state.white_player }</div>
-                      </div>
-                      <div className="row">
-                        <div className="col" id="white_side">{ white_player_status }</div>
-                      </div>
-                    </div>
-                  </div>
+                  <div className="col" id="white_side">WHITE</div>
+                </div>
+                <div className="row">
+                  <div className="col" id="message">{ this.state.white_player }</div>
+                </div>
+                <div className="row">
+                  <div className="col" id="white_side">{ white_player_status }</div>
                 </div>
               </div>
             </div>
+
             <div className="col-md-auto">
               <div className="container">
                 <div className="game-left-side">
                   <div className="game-board">
                     <Board squares={this.state.squares} availableMoves={this.state.availableMoves} onClick={(i) => this.handleClick(i)} />
                   </div>
-                  <div></div>
                 </div>
               </div>
             </div>
-            <div className="col">
+
+            <div className="col align-items-start">
               <div className="container">
-                <div className="game-info">
-                  <div>Black markers: {this.state.xNumbers}</div>
-                  <div>White markers: {this.state.oNumbers}</div>
-                  <br />
-                  <div className="game-status">{status}&nbsp;{winner ? <button onClick={() => this.resetGame()}>Play again</button> : ''}</div>
+                <div className="row align-items-start">
+                  <div className="col">
+                    <div className="game-info">
+                      <div>Black markers: {this.state.xNumbers}</div>
+                      <div>White markers: {this.state.oNumbers}</div>
+                      <br />
+                      <div className="game-status">{status}&nbsp;{winner ? <button onClick={() => this.resetGame()}>Play again</button> : ''}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
