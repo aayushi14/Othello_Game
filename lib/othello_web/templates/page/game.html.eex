@@ -5,13 +5,13 @@
 
 <div class="row">
   <div class="col">
-    <h1 id="game-h1">Othello Game:  <%= @game %></h1>
-  </div>
-  <nav role="navigation">
-    <ul class="nav nav-pills" class="navbar navbar-fixed-top navbar-light bg-light justify-content-end">
-      <li><a href="/"><img src="/images/othello.jpg/" alt="Help" width="50px" height="50px"></a></li>
-    </ul>
-  </nav>
+    <nav role="navigation">
+      <h1 id="game-h1">Othello Game:  <%= @game %></h1>
+      <ul class="nav nav-pills" class="navbar navbar-fixed-top navbar-light bg-light justify-content-end">
+        <li><a href="/">Go Back</a></li>
+      </ul>
+    </nav>
+  </div> 
 </div>
 
 <div class="container">

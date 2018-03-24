@@ -58,8 +58,10 @@ class Othello extends React.Component {
 
   handleClick(id) {
     console.log("Inside handleClick");
+    console.log(this.state);
+
     this.channel.push("tohandleClick", {id: id})
-    .receive("ok", this.gotView.bind(this));
+     .receive("ok", this.gotView.bind(this));
   }
 
 

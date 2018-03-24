@@ -31947,6 +31947,8 @@ var Othello = function (_React$Component) {
     key: 'handleClick',
     value: function handleClick(id) {
       console.log("Inside handleClick");
+      console.log(this.state);
+
       this.channel.push("tohandleClick", { id: id }).receive("ok", this.gotView.bind(this));
     }
   }, {
