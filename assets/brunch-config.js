@@ -67,7 +67,8 @@ exports.config = {
     enabled: true,
     globals: {
       _: 'underscore',
-      $: 'jquery'
+      $: 'jquery',
+      bootstrap: 'bootstrap'
     }
   }
 };

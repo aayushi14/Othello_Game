@@ -19,18 +19,23 @@ class Othello extends React.Component {
 
     this.state = {
       squares: initSquares,
-      xNumbers: 2,                              // number of black color pieces
-      oNumbers: 2,                              // number of white color pieces
+      xNumbers: 2,                     // number of black color pieces
+      oNumbers: 2,                     // number of white color pieces
       xWasNext: true,
       xIsNext: true,
-      availableMoves: [],                       // the available moves for black player (current)
-      availableMovesOpposite: [],               // the available moves for white player
-      black_player: "",                         // name of the player with black colored pieces
-      white_player: "",                         // name of the player with white colored pieces
-      spectators: [],                           // the list of spectators
-      current_player: "",                       // black player moves first
-      msgs: [],                                 // list of messages
+      availableMoves: [],              // the available moves for black player (current)
+      availableMovesOpposite: [],      // the available moves for white player
+      black_player: "",                // name of the player with black colored pieces
+      white_player: "",                // name of the player with white colored pieces
+      spectators: [],                  // the list of spectators
+      current_player: "",              // black player moves first
+      msgs: [],                        // list of messages
+      status: "Waiting"                // status of the game
     };
+
+    this.channel.on("toleaveGame", payload => {
+      this.setState(payload.game_state);
+    });
 
     this.channel.on("tohandleClick", payload => {
       this.setState(payload.game_state);
@@ -60,6 +65,11 @@ class Othello extends React.Component {
   calculateWinner(xNumbers, oNumbers) {
     return (xNumbers + oNumbers < 64) ? null : (xNumbers === oNumbers) ? "XO" : (xNumbers > oNumbers ? "X" : "O");
   }
+
+  leaveGame() {
+    this.channel.push("toleaveGame");
+  }
+
 
   handleClick(id) {
     console.log("Inside handleClick");
@@ -97,8 +107,7 @@ class Othello extends React.Component {
 
   componentDidMount() {
     this.channel.on("tohandleClick", payload => {
-      let game_state = payload.game_state;
-      this.setState(game_state);
+      this.setState(payload.game_state);
     });
   }
 
@@ -126,7 +135,7 @@ class Othello extends React.Component {
 
     let black_player_status = "";
     let white_player_status = "";
-    if (this.state.black_player == "" || this.state.white_player == "") {
+    if (this.state.black_player == "" || this.state.white_player == "" || this.state.status == "Waiting") {
       black_player_status = "Wait...";
       white_player_status = "Wait...";
     } else if (this.state.current_player == this.state.black_player) {

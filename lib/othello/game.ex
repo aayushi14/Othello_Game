@@ -27,6 +27,7 @@ defmodule Othello.Game do
       spectators: [],
       current_player: "",
       msgs: [],
+      status: "Waiting"      # game status can be Waiting, Playing and Finished
     }
   end
 
@@ -45,6 +46,7 @@ defmodule Othello.Game do
       spectators: game.spectators,
       current_player: game.current_player,
       msgs: game.msgs,
+      status: game.status,
     }
   end
 
@@ -61,6 +63,7 @@ defmodule Othello.Game do
     current_player = game.current_player
     spectators = game.spectators
     msgs = game.msgs
+    status = game.status
 
     cond do
       # if the user has already joined, return that game
@@ -79,29 +82,43 @@ defmodule Othello.Game do
         if white_player == "" do
           msgs = List.insert_at(msgs, -1, ["system", "[game]: " <> user_name <> " joined as white player."])
           white_player = user_name
+          status = "Playing"
         else
           msgs = List.insert_at(msgs, -1, ["system", "[game]: " <> user_name <> " joined as black player."])
           black_player = user_name
           current_player = user_name
+          status = "Playing"
         end
       true ->
         msgs = List.insert_at(msgs, -1, ["system", "[game]: " <> user_name <> " joined as spectator."])
         spectators = List.insert_at(game.spectators, -1, user_name)
     end
-    %{game | black_player: black_player, white_player: white_player, current_player: current_player, spectators: spectators, msgs: msgs}
+    %{game | black_player: black_player, white_player: white_player, current_player: current_player, spectators: spectators, msgs: msgs, status: status}
   end
 
-  def toReset(game) do
-    squares = game.squares
-    xNumbers = game.xNumbers
-    oNumbers = game.oNumbers
-    xWasNext = game.xWasNext
-    xIsNext = game.xIsNext
-    availableMoves = game.availableMoves
-    availableMovesOpposite = game.availableMovesOpposite
-
-    initSquares = initSq()
-    %{game | squares: initSquares, xNumbers: 2, oNumbers: 2, xWasNext: true, xIsNext: true, availableMoves: [20, 29, 34, 43], availableMovesOpposite: [19, 26, 37, 44]}
+  # A user leaves
+  # If the game has started, and one player leaves, the opposite wins
+  # else just remove the player or observer
+  # If no user is the game, delete the game
+  def userLeavesGame(game, user_type, user_name) do
+    black_player = game.black_player
+    white_player = game.white_player
+    current_player = game.current_player
+    spectators = game.spectators
+    msgs = game.msgs
+    status = game.status
+    msgs = List.insert_at(msgs, -1, ["system", "[game]: " <> user_name <> " has left the game."])
+    case user_type do
+      :black_player ->
+        black_player = ""
+        status = "Waiting"
+      :white_player ->
+        white_player = ""
+        status = "Waiting"
+      :observer ->
+        spectators = List.delete(game.spectators, user_name)
+    end
+    %{game | black_player: black_player, white_player: white_player, current_player: current_player, spectators: spectators, msgs: msgs, status: status}
   end
 
   def calculateWinner(xNumbers, oNumbers) do
