@@ -41367,6 +41367,116 @@ exports.default = Board;
 
 });
 
+require.register("js/chat.jsx", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactstrap = require('reactstrap');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Chat = function (_Component) {
+  _inherits(Chat, _Component);
+
+  function Chat(props) {
+    _classCallCheck(this, Chat);
+
+    return _possibleConstructorReturn(this, (Chat.__proto__ || Object.getPrototypeOf(Chat)).call(this, props));
+  }
+
+  _createClass(Chat, [{
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps, prevState) {
+      var element = document.getElementById('chatAppBody');
+      element.scrollTop = element.scrollHeight - element.clientHeight;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
+
+      var msgs = this.props.msgs;
+      var msgArea = [];
+      for (var i = 0; i < msgs.length; i++) {
+        var msg = msgs[i];
+        var msgType = msg[0];
+        var msgInfo = msg[1];
+        var msgTypeClass = "";
+        if (msgType == "system") {
+          msgTypeClass = "systemMsg";
+        } else if (msgType == "player") {
+          msgTypeClass = "playerMsg";
+        } else if (msgType == "spectator") {
+          msgTypeClass = "spectatorMsg";
+        }
+        msgArea.push(_react2.default.createElement(
+          'div',
+          { className: "row chatMsg " + msgTypeClass, key: "msg" + i },
+          ' ',
+          msgInfo,
+          ' '
+        ));
+      }
+
+      return _react2.default.createElement(
+        'div',
+        { id: 'chatApp', className: 'container game-container' },
+        _react2.default.createElement(
+          'div',
+          { id: 'chatAppHeader', className: 'row' },
+          'ChatApp'
+        ),
+        _react2.default.createElement(
+          'div',
+          { id: 'chatAppBody', className: 'row' },
+          _react2.default.createElement(
+            'div',
+            { className: 'container game-container' },
+            msgArea
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'row align-items-end' },
+          _react2.default.createElement(
+            'div',
+            { className: 'col' },
+            _react2.default.createElement('input', { type: 'text', id: 'chatInput', onKeyUp: function onKeyUp(event) {
+                return event.keyCode === 13 && _this2.props.send_msg(event);
+              } }),
+            _react2.default.createElement(
+              'button',
+              { id: 'post', onClick: this.props.send_msg },
+              'Send'
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return Chat;
+}(_react.Component);
+
+exports.default = Chat;
+
+});
+
 require.register("js/othello.jsx", function(exports, require, module) {
 'use strict';
 
@@ -41390,6 +41500,10 @@ var _board = require('./board.jsx');
 
 var _board2 = _interopRequireDefault(_board);
 
+var _chat = require('./chat.jsx');
+
+var _chat2 = _interopRequireDefault(_chat);
+
 var _reactstrap = require('reactstrap');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -41412,9 +41526,9 @@ var Othello = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Othello.__proto__ || Object.getPrototypeOf(Othello)).call(this, props));
 
-    console.log(props);
     _this.channel = props.channel;
-    console.log(_this.channel);
+    _this.user_name = props.channel.params.user_name;
+
     var initSquares = Array(64).fill(null);
     var _ref = ["X", "O", "X", "O"];
     initSquares[8 * 3 + 3] = _ref[0];
@@ -41422,8 +41536,6 @@ var Othello = function (_React$Component) {
     initSquares[8 * 4 + 4] = _ref[2];
     initSquares[8 * 4 + 3] = _ref[3];
 
-    console.log("constructor initSquares: ");
-    console.log(initSquares);
 
     _this.state = {
       squares: initSquares,
@@ -41436,33 +41548,30 @@ var Othello = function (_React$Component) {
       black_player: "", // name of the player with black colored pieces
       white_player: "", // name of the player with white colored pieces
       spectators: [], // the list of spectators
-      current_player: "" // black player moves first
+      current_player: "", // black player moves first
+      msgs: [] // list of messages
     };
 
-    _this.channel.on("join", function (payload) {
-      var game_state = payload.game_state;
-      console.log("state after joining");
-      console.log(game_state);
-      _this.setState(game_state);
+    _this.channel.on("tohandleClick", function (payload) {
+      _this.setState(payload.game_state);
     });
 
     _this.channel.join().receive("ok", _this.gotView.bind(_this)).receive("error", function (resp) {
       console.log("Unable to join", resp);
     });
+    _this.send_msg = _this.send_msg.bind(_this);
+
+    _this.channel.on("join", function (payload) {
+      _this.setState(payload.game_state);
+    });
+
+    _this.channel.on("new_msg", function (payload) {
+      _this.setState(payload.game_state);
+    });
     return _this;
   }
 
   _createClass(Othello, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      var _this2 = this;
-
-      this.channel.on("tohandleClick", function (payload) {
-        var game_state = payload.game_state;
-        _this2.setState(game_state);
-      });
-    }
-  }, {
     key: 'gotView',
     value: function gotView(view) {
       this.setState(view.game);
@@ -41479,23 +41588,28 @@ var Othello = function (_React$Component) {
     value: function handleClick(id) {
       console.log("Inside handleClick");
       console.log(this.state);
-
-      this.channel.push("tohandleClick", { id: id }).receive("ok", this.gotView.bind(this));
-    }
-  }, {
-    key: 'resetGame',
-    value: function resetGame() {
-      this.channel.push("toReset").receive("ok", this.gotView.bind(this));
+      this.channel.push("tohandleClick", { id: id });
     }
   }, {
     key: 'checkAvailableMoves',
     value: function checkAvailableMoves(xWasNext, squares) {
-      this.channel.push("tocheckAvailableMoves", { xWasNext: xWasNext, squares: squares });
+      this.channel.push("tocheckAvailableMoves", { xWasNext: xWasNext, squares: squares }).receive("ok", this.gotView.bind(this));
     }
   }, {
     key: 'checkAvailableMovesOpposite',
     value: function checkAvailableMovesOpposite(notxWasNext, squares) {
-      this.channel.push("tocheckAvailableMovesOpposite", { notxWasNext: notxWasNext, squares: squares });
+      this.channel.push("tocheckAvailableMovesOpposite", { notxWasNext: notxWasNext, squares: squares }).receive("ok", this.gotView.bind(this));
+    }
+
+    // send message in the chat room
+
+  }, {
+    key: 'send_msg',
+    value: function send_msg(e) {
+      var chatInput = document.querySelector("#chatInput");
+      var msg = chatInput.value;
+      this.channel.push("send_msg", { user_name: this.user_name, msg: msg });
+      chatInput.value = "";
     }
   }, {
     key: 'componentWillMount',
@@ -41505,6 +41619,16 @@ var Othello = function (_React$Component) {
       } else if (this.state.white_player == this.state.current_player) {
         this.channel.push("tocheckAvailableMoves", { xWasNext: !this.state.xWasNext, squares: this.state.squares }).receive("ok", this.gotView.bind(this));
       }
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      this.channel.on("tohandleClick", function (payload) {
+        var game_state = payload.game_state;
+        _this2.setState(game_state);
+      });
     }
   }, {
     key: 'render',
@@ -41548,6 +41672,25 @@ var Othello = function (_React$Component) {
         _react2.default.createElement(
           'div',
           { className: 'container' },
+          _react2.default.createElement(
+            'div',
+            { className: 'row align-items-end' },
+            _react2.default.createElement(
+              'div',
+              { className: 'col' },
+              _react2.default.createElement(
+                'nav',
+                { className: 'navbar justify-content-end', role: 'navigation' },
+                _react2.default.createElement(
+                  'a',
+                  { href: '/', className: 'pull-right ng-scope', onClick: function onClick() {
+                      return _this3.leaveGame();
+                    } },
+                  'Leave Game'
+                )
+              )
+            )
+          ),
           _react2.default.createElement(
             'div',
             { className: 'row justify-content-md-center' },
@@ -41681,6 +41824,22 @@ var Othello = function (_React$Component) {
                         ) : ''
                       )
                     )
+                  )
+                ),
+                _react2.default.createElement(
+                  'div',
+                  null,
+                  _react2.default.createElement('br', null),
+                  _react2.default.createElement('br', null),
+                  _react2.default.createElement('br', null)
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'row align-items-start' },
+                  _react2.default.createElement(
+                    'div',
+                    { className: 'col' },
+                    _react2.default.createElement(_chat2.default, { msgs: this.state.msgs, send_msg: this.send_msg })
                   )
                 )
               )

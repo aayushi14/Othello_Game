@@ -24,15 +24,25 @@
 <div class="container">
   <%= for r <- @room do %>
     <div class="card">
-      <div class="card-header">Game: <%= r %></div>
-      <div class="card-text" id="black_block"><%= Map.get(Map.get(@instances, r), :black_player) %></div>
+      <div class="card-header">Game name: <%= r %></div>
+      <div class="card-text" id="black_block">
+        <%= if (Map.get(Map.get(@instances, r), :black_player) != "") do %>
+        <%= Map.get(Map.get(@instances, r), :black_player) %>
+        <% else %>
+        Waiting to join...
+        <% end %>
+      </div>
       <div class="card-text" id="black_block"><%= Map.get(Map.get(@instances, r), :xNumbers) %> pieces</div>
-      <div class="card-text"><%= Map.get(Map.get(@instances, r), :white_player) %></div>
+      <div class="card-text" id="white_block">
+        <%= if (Map.get(Map.get(@instances, r), :white_player) != "") do %>
+        <%= Map.get(Map.get(@instances, r), :white_player) %>
+        <% else %>
+        Waiting to join...
+        <% end %>
+      </div>
       <div class="card-text" id="white_block"><%= Map.get(Map.get(@instances, r), :oNumbers) %> pieces</div>
       <div class="card-text" id="spectator"><%= Map.get(Map.get(@instances, r), :spectators) %></div>
-      <div class="card-text">Status: Open</div>
-
-      <div class="card-text"><button type="button" class="btn btn-sm btn-outline-dark" onclick="toJoin()">Join</button></div>
+      <%= link to: "/game/" <> r, method: :get, class: "btn btn-sm btn-outline-dark" do %>View<% end %>
     </div>
   <% end %>
   <br />

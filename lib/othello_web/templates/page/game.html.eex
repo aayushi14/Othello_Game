@@ -6,23 +6,9 @@
 <nav class="navbar fixed-top navbar-dark bg-dark justify-content-center" role="navigation">
   <h1 class="navbar-brand disabled">Othello Game:  <%= @game %></h1>
 </nav>
-<br>
-<br>
-<br>
-<nav class="navbar justify-content-end" role="navigation">
-  <a href="/" class="pull-right ng-scope">Go Back</a>
-</nav>
-<br>
-<div class="row">
-<div class="container">
-  <div class="row">
-    <div class="col">
+<br /><br /><br /><br />
 
-      <%# Game display target %>
-      <div id="root">
-        <p>React app not loaded...</p>
-      </div>
-    </div>
-  </div>
-</div>
+<%# Game display target %>
+<div id="root">
+  <p>React app not loaded...</p>
 </div>

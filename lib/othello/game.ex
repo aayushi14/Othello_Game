@@ -1,41 +1,5 @@
 defmodule Othello.Game do
 
-  # Join a new user
-  # If it is first user, set it with black piece
-  # If it is second user, set it with white piece
-  # else add the user in the observer list
-  def join(game, user_name) do
-    IO.puts "INSIDE JOIN"
-    IO.inspect user_name
-    IO.puts "----------"
-    black_player = game.black_player
-    white_player = game.white_player
-    current_player = game.current_player
-    spectators = game.spectators
-    cond do
-      # if the user has already joined, return that game
-      black_player == user_name or white_player == user_name or Enum.member?(spectators, user_name) ->
-        game
-      black_player == "" and white_player == "" ->
-        if :rand.uniform(2) == 1 do
-          white_player = user_name
-        else
-          black_player = user_name
-          current_player = user_name
-        end
-      black_player == "" or white_player == "" ->
-        if white_player == "" do
-          white_player = user_name
-        else
-          black_player = user_name
-          current_player = user_name
-        end
-      true ->
-        spectators = List.insert_at(game.spectators, -1, user_name)
-    end
-    %{game | black_player: black_player, white_player: white_player, current_player: current_player, spectators: spectators}
-  end
-
   @board_squares 0..63
 
   def initSq do
@@ -62,6 +26,7 @@ defmodule Othello.Game do
       white_player: "",
       spectators: [],
       current_player: "",
+      msgs: [],
     }
   end
 
@@ -79,9 +44,52 @@ defmodule Othello.Game do
       white_player: game.white_player,
       spectators: game.spectators,
       current_player: game.current_player,
+      msgs: game.msgs,
     }
   end
 
+  # Join a new user
+  # If it is first user, set it with black piece
+  # If it is second user, set it with white piece
+  # else add the user in the observer list
+  def join(game, user_name) do
+    IO.puts "INSIDE JOIN"
+    IO.inspect user_name
+    IO.puts "----------"
+    black_player = game.black_player
+    white_player = game.white_player
+    current_player = game.current_player
+    spectators = game.spectators
+    msgs = game.msgs
+
+    cond do
+      # if the user has already joined, return that game
+      black_player == user_name or white_player == user_name or Enum.member?(spectators, user_name) ->
+        game
+      black_player == "" and white_player == "" ->
+        if :rand.uniform(2) == 1 do
+          msgs = List.insert_at(msgs, -1, ["system", "[game]: " <> user_name <> " joined as white player."])
+          white_player = user_name
+        else
+          msgs = List.insert_at(msgs, -1, ["system", "[game]: " <> user_name <> " joined as black player."])
+          black_player = user_name
+          current_player = user_name
+        end
+      black_player == "" or white_player == "" ->
+        if white_player == "" do
+          msgs = List.insert_at(msgs, -1, ["system", "[game]: " <> user_name <> " joined as white player."])
+          white_player = user_name
+        else
+          msgs = List.insert_at(msgs, -1, ["system", "[game]: " <> user_name <> " joined as black player."])
+          black_player = user_name
+          current_player = user_name
+        end
+      true ->
+        msgs = List.insert_at(msgs, -1, ["system", "[game]: " <> user_name <> " joined as spectator."])
+        spectators = List.insert_at(game.spectators, -1, user_name)
+    end
+    %{game | black_player: black_player, white_player: white_player, current_player: current_player, spectators: spectators, msgs: msgs}
+  end
 
   def toReset(game) do
     squares = game.squares
@@ -288,7 +296,7 @@ defmodule Othello.Game do
     IO.inspect modifiedBoard
     if modifiedBoard != nil do
       if Enum.at(modifiedBoard, index) != nil do
-        listOfModifiedIndex = listOfModifiedIndex ++ [index]
+        listOfModifiedIndex = List.insert_at(listOfModifiedIndex, -1, index)
         IO.puts "check here: listOfModifiedIndex "
         IO.inspect listOfModifiedIndex
       else
@@ -393,6 +401,18 @@ defmodule Othello.Game do
     IO.puts "after checkAvailableMovesOpposite availableMovesOpposite: "
     IO.inspect availableMovesOpposite
     %{game | availableMovesOpposite: availableMovesOpposite}
+  end
+
+  def send_msg(game, user_name, msg) do
+    black_player = game.black_player
+    white_player = game.white_player
+    msgs = game.msgs
+    if user_name == black_player or user_name == white_player do
+      msgs = List.insert_at(msgs, -1, ["player", "[" <> user_name <> "]: " <> msg])
+    else
+      msgs = List.insert_at(msgs, -1, ["spectator", "[" <> user_name <> "]: " <> msg])
+    end
+    %{game | msgs: msgs}
   end
 
 end

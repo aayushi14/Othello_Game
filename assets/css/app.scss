@@ -245,3 +245,61 @@ ol, ul {
     padding-left: 0;
   }
 }
+
+// Chat app
+#chatApp {
+  text-align: left;
+  border: 1px solid #3D808D;
+}
+
+#chatAppHeader {
+  background-color: #3D808D;
+  color: #f2f2f5;
+  font-size: 150%;
+  width: auto;
+  margin-bottom: 1px;
+}
+
+#chatAppBody {
+  background-color: #f2f2f5;
+  width: auto;
+  height: 420px;
+  border: 1px solid #3D808D;
+  padding: 0px;
+  margin-bottom: 3px;
+  overflow-y: scroll;
+}
+
+.chatMsg {
+  text-align: left;
+  font-size: 12px;
+}
+
+#chatInput {
+  width: 195%;
+  float: left;
+  margin-left: -17%;
+}
+
+.systemMsg {
+  color: #c56b6b;
+}
+
+.playerMsg {
+  color: #5faf77;
+}
+
+.spectatorMsg {
+  color: #757679;
+}
+
+#post {
+  float: right;
+  background-color: #004b9e;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  margin-right: -15%;
+  width: 70%;
+  height: 30px;
+}

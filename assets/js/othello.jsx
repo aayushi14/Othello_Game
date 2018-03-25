@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Board from './board.jsx';
+import Chat from './chat.jsx';
 import { Button } from 'reactstrap';
 
 export default function game_init(root, channel) {
@@ -10,13 +11,11 @@ export default function game_init(root, channel) {
 class Othello extends React.Component {
   constructor(props) {
     super(props);
-    console.log(props);
     this.channel = props.channel;
-    console.log(this.channel)
+    this.user_name = props.channel.params.user_name;
+
     const initSquares = Array(64).fill(null);
     [initSquares[8 * 3 + 3], initSquares[8 * 3 + 4], initSquares[8 * 4 + 4], initSquares[8 * 4 + 3]] = ["X", "O", "X", "O"];
-    console.log("constructor initSquares: ");
-    console.log(initSquares);
 
     this.state = {
       squares: initSquares,
@@ -30,27 +29,26 @@ class Othello extends React.Component {
       white_player: "",                         // name of the player with white colored pieces
       spectators: [],                           // the list of spectators
       current_player: "",                       // black player moves first
+      msgs: [],                                 // list of messages
     };
 
-    this.channel.on("join", payload => {
-      let game_state = payload.game_state;
-      console.log("state after joining");
-      console.log(game_state);
-      this.setState(game_state);
+    this.channel.on("tohandleClick", payload => {
+      this.setState(payload.game_state);
     });
 
     this.channel.join()
       .receive("ok", this.gotView.bind(this))
       .receive("error", resp => { console.log("Unable to join", resp)
     });
-  }
+    this.send_msg = this.send_msg.bind(this);
 
-  componentDidMount() {
-    this.channel.on("tohandleClick", payload => {
-      let game_state = payload.game_state;
-      this.setState(game_state);
+    this.channel.on("join", payload => {
+      this.setState(payload.game_state);
     });
 
+    this.channel.on("new_msg", payload => {
+      this.setState(payload.game_state);
+    });
   }
 
   gotView(view) {
@@ -66,23 +64,25 @@ class Othello extends React.Component {
   handleClick(id) {
     console.log("Inside handleClick");
     console.log(this.state);
-
-    this.channel.push("tohandleClick", {id: id})
-     .receive("ok", this.gotView.bind(this));
-  }
-
-
-  resetGame() {
-    this.channel.push("toReset")
-    .receive("ok", this.gotView.bind(this));
+    this.channel.push("tohandleClick", {id: id});
   }
 
   checkAvailableMoves(xWasNext, squares) {
-    this.channel.push("tocheckAvailableMoves", {xWasNext: xWasNext, squares: squares});
+    this.channel.push("tocheckAvailableMoves", {xWasNext: xWasNext, squares: squares})
+     .receive("ok", this.gotView.bind(this));
   }
 
   checkAvailableMovesOpposite(notxWasNext, squares) {
-    this.channel.push("tocheckAvailableMovesOpposite", {notxWasNext: notxWasNext, squares: squares});
+    this.channel.push("tocheckAvailableMovesOpposite", {notxWasNext: notxWasNext, squares: squares})
+     .receive("ok", this.gotView.bind(this));
+  }
+
+  // send message in the chat room
+  send_msg(e) {
+    let chatInput = document.querySelector("#chatInput");
+    let msg = chatInput.value;
+    this.channel.push("send_msg", { user_name: this.user_name, msg: msg });
+    chatInput.value = "";
   }
 
   componentWillMount() {
@@ -93,6 +93,13 @@ class Othello extends React.Component {
     this.channel.push("tocheckAvailableMoves", {xWasNext: !this.state.xWasNext, squares: this.state.squares})
     .receive("ok", this.gotView.bind(this));
     }
+  }
+
+  componentDidMount() {
+    this.channel.on("tohandleClick", payload => {
+      let game_state = payload.game_state;
+      this.setState(game_state);
+    });
   }
 
   render() {
@@ -117,8 +124,6 @@ class Othello extends React.Component {
       		(winner === "XO") ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') :
       		[this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
 
-
-
     let black_player_status = "";
     let white_player_status = "";
     if (this.state.black_player == "" || this.state.white_player == "") {
@@ -135,6 +140,13 @@ class Othello extends React.Component {
     return (
       <div className="game">
         <div className="container">
+          <div className="row align-items-end">
+            <div className="col">
+              <nav className="navbar justify-content-end" role="navigation">
+                <a href="/" className="pull-right ng-scope" onClick={() => this.leaveGame()}>Leave Game</a>
+              </nav>
+            </div>
+          </div>
           <div className="row justify-content-md-center">
 
             <div className="col">
@@ -181,6 +193,12 @@ class Othello extends React.Component {
                       <br />
                       <div className="game-status">{status}&nbsp;{winner ? <button onClick={() => this.resetGame()}>Play again</button> : ''}</div>
                     </div>
+                  </div>
+                </div>
+                <div><br /><br /><br /></div>
+                <div className="row align-items-start">
+                  <div className="col">
+                    <Chat msgs={this.state.msgs} send_msg={this.send_msg} />
                   </div>
                 </div>
               </div>

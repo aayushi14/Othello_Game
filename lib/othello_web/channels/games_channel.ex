@@ -40,8 +40,7 @@ defmodule OthelloWeb.GamesChannel do
     socket = assign(socket, :game, game)
     IO.inspect socket
 
-    broadcast socket, "tohandleClick", %{"game_state" => game}
-
+    broadcast socket, "tohandleClick", %{"game_state" => Game.client_view(game)}
     {:noreply, socket}
   end
 
@@ -59,7 +58,7 @@ defmodule OthelloWeb.GamesChannel do
     IO.puts "AFTER tocheckAvailableMoves"
     socket = assign(socket, :game, game)
 
-    broadcast socket, "tocheckAvailableMoves", %{"game_state" => game}
+    broadcast socket, "tocheckAvailableMoves", %{"game_state" => Game.client_view(game)}
     {:noreply, socket}
   end
 
@@ -70,7 +69,7 @@ defmodule OthelloWeb.GamesChannel do
     GameBackup.save(socket.assigns[:name], game)
     socket = assign(socket, :game, game)
 
-    broadcast socket, "tocheckAvailableMovesOpposite", %{"game_state" => game}
+    broadcast socket, "tocheckAvailableMovesOpposite", %{"game_state" => Game.client_view(game)}
     {:noreply, socket}
   end
 
@@ -79,7 +78,15 @@ defmodule OthelloWeb.GamesChannel do
     GameBackup.save(socket.assigns[:name], game)
     socket = assign(socket, :game, game)
 
-    broadcast socket, "toReset", %{"game_state" => game}
+    broadcast socket, "toReset", %{"game_state" => Game.client_view(game)}
+    {:noreply, socket}
+  end
+
+  def handle_in("send_msg", %{"user_name" => user_name, "msg" => msg}, socket) do
+    game = GameBackUp.load(socket.assigns[:name])
+    game = Game.send_msg(game, user_name, msg)
+    GameBackUp.save(socket.assigns[:name], game)
+    broadcast! socket, "new_msg", %{"game_state" => Game.client_view(game)}
     {:noreply, socket}
   end
 
