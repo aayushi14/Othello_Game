@@ -2,7 +2,7 @@
 
 export PORT=5114
 export MIX_ENV=prod
-export GIT_PATH=/home/othello/Othello_Game
+export GIT_PATH=/home/Othello_Game/Othello_Game
 
 PWD=`pwd`
 if [ $PWD != $GIT_PATH ]; then
