@@ -12,3 +12,20 @@
 <div id="root">
   <p>React app not loaded...</p>
 </div>
+
+<!-- The Modal -->
+<div class="modal" id="gameOverModal" role="dialog">
+  <div class="modal-dialog modal-dialog-centered">
+    <!-- Modal content -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Game Over!</h4>
+      </div>
+      <div class="modal-body">
+        <h4 id="gameOverMsg"></h4>
+      </div>
+      <div class="modal-footer">
+        <a role="button" class="btn btn-success" href="/">Leave</a>
+      </div>
+    </div>
+  </div>

@@ -32,7 +32,7 @@
         Waiting to join...
         <% end %>
       </div>
-      <div class="card-text" id="black_block"><%= Map.get(Map.get(@instances, r), :xNumbers) %> pieces</div>
+      <div class="card-text" id="black_block"><%= Map.get(Map.get(@instances, r), :black_pieces) %> pieces</div>
       <div class="card-text" id="white_block">
         <%= if (Map.get(Map.get(@instances, r), :white_player) != "") do %>
         <%= Map.get(Map.get(@instances, r), :white_player) %>
@@ -40,7 +40,7 @@
         Waiting to join...
         <% end %>
       </div>
-      <div class="card-text" id="white_block"><%= Map.get(Map.get(@instances, r), :oNumbers) %> pieces</div>
+      <div class="card-text" id="white_block"><%= Map.get(Map.get(@instances, r), :white_pieces) %> pieces</div>
       <div class="card-text" id="spectator"><%= Map.get(Map.get(@instances, r), :spectators) %></div>
       <%= link to: "/game/" <> r, method: :get, class: "btn btn-sm btn-outline-dark" do %>View<% end %>
     </div>

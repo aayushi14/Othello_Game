@@ -1,5 +1,9 @@
 defmodule Othello.Game do
+  @moduledoc """
+  Game board
+  """
 
+  # total squares in the board
   @board_squares 0..63
 
   def initSq do
@@ -16,27 +20,29 @@ defmodule Othello.Game do
     initSquares = initSq()
     %{
       squares: initSquares,
-      xNumbers: 2,
-      oNumbers: 2,
+      black_pieces: 2,
+      white_pieces: 2,
       xWasNext: true,
       xIsNext: true,
       availableMoves: [],
       availableMovesOpposite: [],
-      black_player: "",
-      white_player: "",
+      black_player: nil,
+      white_player: nil,
       spectators: [],
-      current_player: "",
+      current_player: nil,
       msgs: [],
-      status: "Waiting"      # game status can be Waiting, Playing and Finished
+      status: "Waiting",    # game status can be Waiting, Playing and Finished
     }
   end
 
-  # Initialize the board
+  @doc """
+  Initialize the board
+  """
   def client_view(game) do
     %{
       squares: game.squares,
-      xNumbers: game.xNumbers,
-      oNumbers: game.oNumbers,
+      black_pieces: game.black_pieces,
+      white_pieces: game.white_pieces,
       xWasNext: game.xWasNext,
       xIsNext: game.xIsNext,
       availableMoves: game.availableMoves,
@@ -50,10 +56,12 @@ defmodule Othello.Game do
     }
   end
 
-  # Join a new user
-  # If it is first user, set it with black piece
-  # If it is second user, set it with white piece
-  # else add the user in the observer list
+  @doc """
+  Join a new user
+  If it is first user, randomly set it with black or white piece
+  If it is second user, set it with the remaining piece
+  else add the user in the spectator list
+  """
   def join(game, user_name) do
     IO.puts "INSIDE JOIN"
     IO.inspect user_name
@@ -69,7 +77,7 @@ defmodule Othello.Game do
       # if the user has already joined, return that game
       black_player == user_name or white_player == user_name or Enum.member?(spectators, user_name) ->
         game
-      black_player == "" and white_player == "" ->
+      black_player == nil and white_player == nil ->
         if :rand.uniform(2) == 1 do
           msgs = List.insert_at(msgs, -1, ["system", "[game]: " <> user_name <> " joined as white player."])
           white_player = user_name
@@ -78,8 +86,8 @@ defmodule Othello.Game do
           black_player = user_name
           current_player = user_name
         end
-      black_player == "" or white_player == "" ->
-        if white_player == "" do
+      black_player == nil or white_player == nil ->
+        if white_player == nil do
           msgs = List.insert_at(msgs, -1, ["system", "[game]: " <> user_name <> " joined as white player."])
           white_player = user_name
           status = "Playing"
@@ -96,10 +104,12 @@ defmodule Othello.Game do
     %{game | black_player: black_player, white_player: white_player, current_player: current_player, spectators: spectators, msgs: msgs, status: status}
   end
 
-  # A user leaves
-  # If the game has started, and one player leaves, the opposite wins
-  # else just remove the player or observer
-  # If no user is the game, delete the game
+  @doc """
+  A user leaves
+  If the game has started, and one player leaves, the opposite wins
+  else just remove the player or observer
+  If no user is in the game, delete the game
+  """
   def userLeavesGame(game, user_type, user_name) do
     black_player = game.black_player
     white_player = game.white_player
@@ -110,30 +120,38 @@ defmodule Othello.Game do
     msgs = List.insert_at(msgs, -1, ["system", "[game]: " <> user_name <> " has left the game."])
     case user_type do
       :black_player ->
-        black_player = ""
+        black_player = nil
         status = "Waiting"
       :white_player ->
-        white_player = ""
+        white_player = nil
         status = "Waiting"
-      :observer ->
+      :spectator ->
         spectators = List.delete(game.spectators, user_name)
     end
     %{game | black_player: black_player, white_player: white_player, current_player: current_player, spectators: spectators, msgs: msgs, status: status}
   end
 
-  def calculateWinner(xNumbers, oNumbers) do
+  @doc """
+  If the number of black and white pieces
+  add up to less than 64, no winner as of yet
+  is equal, its a tie
+  is such that black is more, black player is the winner
+  else white is the winner
+  """
+  def calculateWinner(black_pieces, white_pieces) do
     IO.puts "inside calculateWinner"
-    c_winner = cond do
-                xNumbers + oNumbers < 64 -> nil
-                xNumbers === oNumbers -> "XO"
-                xNumbers > oNumbers -> "X"
-                true -> "O"
-              end
-    IO.puts "c_winner"
-    IO.inspect c_winner
-    c_winner
+    winner = cond do
+      black_pieces + white_pieces < 64 -> nil
+      black_pieces === white_pieces -> "XO"
+      black_pieces > white_pieces -> "X"
+      true -> "O"
+    end
+    IO.puts "winner"
+    IO.inspect winner
+    winner
   end
 
+  # initiates the recusion over y (acts like for loop)
   def for_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when is_integer(y) do
     IO.puts "INSIDE for_loop: yyyyyyy "
     IO.inspect y
@@ -143,8 +161,10 @@ defmodule Othello.Game do
     flippedSquares
   end
 
+  # recursive call until y becomes greater than or equal to 64
   defp infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when y >= 64, do: modifiedBoard
 
+  # recursive call until y is less than 64
   defp infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when y < 64 do
     IO.puts "INSIDE infor_loop: "
     # Calculate the row and col of the current square
@@ -210,21 +230,27 @@ defmodule Othello.Game do
     flippedSquares
   end
 
+  @doc """
+  the index of the square clicked by user is 0, and the indexes for surrounding
+  squares is 1, 7, 8, 9, -1, -7, -8, -9.
+  check the current status of each of these squares
+  """
   def setOffset(offset) do
     offset = case offset do
-      0 -> offset = 1
-      1 -> offset = 7
-      7 -> offset = 8
-      8 -> offset = 9
-      9 -> offset = -1
-      -1 -> offset = -7
-      -7 -> offset = -8
-      -8 -> offset = -9
-      _ -> offset = "ok"
+      0 -> 1
+      1 -> 7
+      7 -> 8
+      8 -> 9
+      9 -> -1
+      -1 -> -7
+      -7 -> -8
+      -8 -> -9
+      _ -> "ok"
     end
     offset
   end
 
+  # for each offset around the current index
   def foreach_loop(offset, squares, position, xIsNext, modifiedBoard, startX, startY) do
     IO.puts "INSIDE foreach_loop:"
     IO.puts "INSIDE foreach_loop ------------------ position:"
@@ -255,7 +281,9 @@ defmodule Othello.Game do
     flippedSquares
   end
 
-
+  @doc """
+  flip the square, filling it with black or white piece
+  """
   def flipSquares(squares, position, xIsNext) do
     IO.puts "INSIDE flipSquares"
     modifiedBoard = nil
@@ -290,6 +318,7 @@ defmodule Othello.Game do
     modifiedBoard
   end
 
+  # initiates the recusion over index
   def getmodifiedIndex_loop(squares, index, color, listOfModifiedIndex) when is_integer(index) do
     IO.puts "inside GET_loop index"
     IO.inspect index
@@ -298,8 +327,11 @@ defmodule Othello.Game do
     IO.inspect listOfModifiedIndex
     listOfModifiedIndex
   end
+
+  # recursive call until index becomes greater than or equal to 64
   defp ingetmodifiedIndex_loop(squares, index, color, listOfModifiedIndex) when index >= 64, do: listOfModifiedIndex
 
+  # recursive call until index is less than 64
   defp ingetmodifiedIndex_loop(squares, index, color, listOfModifiedIndex) when index < 64 do
     IO.puts "inside INget_loop"
     IO.puts "inside INget_loop BEFORE flipSquares index"
@@ -328,6 +360,10 @@ defmodule Othello.Game do
       listOfModifiedIndex
   end
 
+  @doc """
+  check all the available squares that a player can click on to get
+  maximum pieces of his color on the board
+  """
   def checkAvailableMoves(color, squares) do
     IO.puts "============INSIDE checkAvailableMoves============"
     IO.inspect(squares)
@@ -338,32 +374,36 @@ defmodule Othello.Game do
     modifiedSquares
   end
 
-  def tohandleClick(game, id) do
-    IO.puts "INSIDE---------------------tohandleClick"
+  @doc """
+  when the current player clicks on a square,
+  flip the square, and fill it with black or white piece
+  """
+  def handleClick(game, id) do
+    IO.puts "INSIDE---------------------handleClick"
     IO.inspect(game.squares)
     squares = game.squares
-    xNumbers = game.xNumbers
-    oNumbers = game.oNumbers
+    black_pieces = game.black_pieces
+    white_pieces = game.white_pieces
     xWasNext = game.xWasNext
     xIsNext = game.xIsNext
     black_player = game.black_player
     white_player = game.white_player
     current_player= game.current_player
 
-    if calculateWinner(xNumbers, oNumbers) || Enum.at(squares,id) do
-      IO.puts "tohandleClick calculateWinner"
+    if calculateWinner(black_pieces, white_pieces) || Enum.at(squares,id) do
+      IO.puts "handleClick calculateWinner"
       changedSquares = squares
     else
-      IO.puts "else tohandleClick"
+      IO.puts "else handleClick"
       changedSquares = flipSquares(squares, id, xIsNext)
       if changedSquares === nil do
-        IO.puts "else, if, tohandleClick"
+        IO.puts "else, if, handleClick"
         changedSquares = squares
       else
-        IO.puts "else, if, else, tohandleClick"
-        xNumbers = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "X", do: acc + 1, else: acc) end)
-        oNumbers = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "O", do: acc + 1, else: acc) end)
-        IO.puts "tohandleClick xIsNext"
+        IO.puts "else, if, else, handleClick"
+        black_pieces = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "X", do: acc + 1, else: acc) end)
+        white_pieces = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "O", do: acc + 1, else: acc) end)
+        IO.puts "handleClick xIsNext"
         IO.inspect xIsNext
         modifiedSquares = checkAvailableMoves( !xIsNext, changedSquares)
         shouldTurnColor = if length(modifiedSquares) > 0, do: !xIsNext, else: xIsNext
@@ -390,9 +430,13 @@ defmodule Othello.Game do
     IO.puts "current_player"
     IO.inspect current_player
 
-    %{game | squares: changedSquares, xNumbers: xNumbers, oNumbers: oNumbers, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor, current_player: current_player}
+    %{game | squares: changedSquares, black_pieces: black_pieces, white_pieces: white_pieces, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor, current_player: current_player}
   end
 
+  @doc """
+  check all the available squares that a player can click on to get
+  maximum pieces of his color on the board
+  """
   def tocheckAvailableMoves(game, color, squares) do
     availableMoves = game.availableMoves
     IO.puts "INSIDE tocheckAvailableMoves squares"
@@ -408,6 +452,9 @@ defmodule Othello.Game do
     %{game | availableMoves: availableMoves}
   end
 
+  @doc """
+  check all the available squares for the opponent
+  """
   def tocheckAvailableMovesOpposite(game, color, squares) do
     availableMovesOpposite = game.availableMovesOpposite
     IO.puts "INSIDE tocheckAvailableMovesOpposite squares"
@@ -420,6 +467,7 @@ defmodule Othello.Game do
     %{game | availableMovesOpposite: availableMovesOpposite}
   end
 
+  # append messages sent by the users into the message list
   def send_msg(game, user_name, msg) do
     black_player = game.black_player
     white_player = game.white_player

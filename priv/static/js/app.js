@@ -45439,35 +45439,72 @@ var Othello = function (_React$Component) {
 
     _this.state = {
       squares: initSquares,
-      xNumbers: 2, // number of black color pieces
-      oNumbers: 2, // number of white color pieces
-      xWasNext: true,
-      xIsNext: true,
+      black_pieces: 2, // number of black color pieces
+      white_pieces: 2, // number of white color pieces
+      xWasNext: true, // black player's turn was next
+      xIsNext: true, // black player's turn iss next
       availableMoves: [], // the available moves for black player (current)
       availableMovesOpposite: [], // the available moves for white player
-      black_player: "", // name of the player with black colored pieces
-      white_player: "", // name of the player with white colored pieces
+      black_player: null, // name of the player with black colored pieces
+      white_player: null, // name of the player with white colored pieces
       spectators: [], // the list of spectators
-      current_player: "", // black player moves first
+      current_player: null, // black player moves first
       msgs: [], // list of messages
       status: "Waiting" // status of the game
     };
 
-    _this.channel.on("toleaveGame", function (payload) {
-      _this.setState(payload.game_state);
-    });
-
-    _this.channel.on("tohandleClick", function (payload) {
-      _this.setState(payload.game_state);
-    });
-
+    // join the channel
     _this.channel.join().receive("ok", _this.gotView.bind(_this)).receive("error", function (resp) {
       console.log("Unable to join", resp);
     });
+
+    // bind the functions to the instance
     _this.send_msg = _this.send_msg.bind(_this);
 
+    // listener for user join
     _this.channel.on("join", function (payload) {
       _this.setState(payload.game_state);
+    });
+
+    // listener for clicking on a square
+    _this.channel.on("handleClick", function (payload) {
+      _this.setState(payload.game_state);
+    });
+
+    // listener for game finish
+    _this.channel.on("finish", function (payload) {
+      _this.setState(payload.game_state);
+
+      var black_pieces = _this.state.black_pieces;
+      var white_pieces = _this.state.white_pieces;
+      var black_player = _this.state.black_player;
+      var white_player = _this.state.white_player;
+      var game_over_msg = "";
+      if (black_pieces == white_pieces) {
+        game_over_msg = "Draw!";
+      } else if (black_pieces > white_pieces) {
+        game_over_msg = "Black player (" + black_player + ") wins!";
+      } else {
+        game_over_msg = "White player (" + white_player + ") wins!";
+      }
+      $("#gameOverMsg").html(game_over_msg);
+      $("#gameOverModal").modal("show");
+    });
+
+    // listener for left game, in case that one of the player leaves in between
+    _this.channel.on("left_game", function (payload) {
+      _this.setState(payload.game_state);
+
+      var black_player = _this.state.black_player;
+      var white_player = _this.state.white_player;
+      var game_over_msg = "";
+      if (black_player == null) {
+        game_over_msg = "The opponent escaped, " + white_player + " wins!";
+      } else if (white_player == null) {
+        game_over_msg = "The opponent escaped, " + black_player + " wins!";
+      }
+      $("#gameOverMsg").html(game_over_msg);
+      $("#gameOverModal").modal("show");
     });
 
     _this.channel.on("new_msg", function (payload) {
@@ -45484,21 +45521,16 @@ var Othello = function (_React$Component) {
       console.log(view.game);
     }
   }, {
-    key: 'calculateWinner',
-    value: function calculateWinner(xNumbers, oNumbers) {
-      return xNumbers + oNumbers < 64 ? null : xNumbers === oNumbers ? "XO" : xNumbers > oNumbers ? "X" : "O";
-    }
-  }, {
     key: 'leaveGame',
     value: function leaveGame() {
-      this.channel.push("toleaveGame");
+      this.channel.push("leaveGame").receive("ok", this.gotView.bind(this));
     }
   }, {
     key: 'handleClick',
     value: function handleClick(id) {
       console.log("Inside handleClick");
       console.log(this.state);
-      this.channel.push("tohandleClick", { id: id });
+      this.channel.push("handleClick", { id: id });
     }
   }, {
     key: 'checkAvailableMoves',
@@ -45535,7 +45567,7 @@ var Othello = function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      this.channel.on("tohandleClick", function (payload) {
+      this.channel.on("handleClick", function (payload) {
         _this2.setState(payload.game_state);
       });
     }
@@ -45545,26 +45577,17 @@ var Othello = function (_React$Component) {
       var _this3 = this;
 
       console.log("INSIDE render: ");
-      var winner = this.calculateWinner(this.state.xNumbers, this.state.oNumbers);
-      console.log("winner: " + winner);
       this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
       console.log("availableMoves: " + this.state.availableMoves);
 
       this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
-      console.log(!this.state.xWasNext);
       console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
 
-      console.log("availableMoves length => " + this.state.availableMoves.length);
+      var status = [this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
 
-      if (this.state.availableMoves.length === 0 && this.state.availableMovesOpposite.length === 0) {
-        winner = this.state.xNumbers === this.state.oNumbers ? "XO" : this.state.xNumbers > this.state.oNumbers ? "X" : "O";
-      }
-
-      var status = winner ? winner === "XO" ? 'It\'s a draw' : 'The winner is ' + (winner === 'W' ? 'White!' : 'Black!') : [this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
-
-      var black_player_status = "";
-      var white_player_status = "";
-      if (this.state.black_player == "" || this.state.white_player == "" || this.state.status == "Waiting") {
+      var black_player_status = null;
+      var white_player_status = null;
+      if (this.state.black_player == null || this.state.white_player == null || this.state.status == "Waiting") {
         black_player_status = "Wait...";
         white_player_status = "Wait...";
       } else if (this.state.current_player == this.state.black_player) {
@@ -45710,27 +45733,19 @@ var Othello = function (_React$Component) {
                         'div',
                         null,
                         'Black markers: ',
-                        this.state.xNumbers
+                        this.state.black_pieces
                       ),
                       _react2.default.createElement(
                         'div',
                         null,
                         'White markers: ',
-                        this.state.oNumbers
+                        this.state.white_pieces
                       ),
                       _react2.default.createElement('br', null),
                       _react2.default.createElement(
                         'div',
                         { className: 'game-status' },
-                        status,
-                        '\xA0',
-                        winner ? _react2.default.createElement(
-                          'button',
-                          { onClick: function onClick() {
-                              return _this3.resetGame();
-                            } },
-                          'Play again'
-                        ) : ''
+                        status
                       )
                     )
                   )

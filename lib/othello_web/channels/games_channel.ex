@@ -17,58 +17,45 @@ defmodule OthelloWeb.GamesChannel do
 
     GameBackup.save(game_name, game)
     socket = socket
-      |> assign(:name, game_name)
+      |> assign(:game_name, game_name)
+      |> assign(:user, user)
 
     send(self(), :after_join)
     {:ok, %{"join" => game_name, "game" => Game.client_view(game)}, socket}
   end
 
+  # broadcast the state after new user has joined
   def handle_info(:after_join, socket) do
-    game = GameBackup.load(socket.assigns[:name])
+    game = GameBackup.load(socket.assigns[:game_name])
     broadcast! socket, "join", %{"game_state" => Game.client_view(game)}
     {:noreply, socket}
   end
 
-  def handle_in("toleaveGame", %{"current_player" => current_player, "black_player" => black_player, "white_player" => white_player, "spectators" => spectators}, socket) do
-    game = GameBackup.load(socket.assigns[:name])
-    game = Game.tohandleClick(game, current_player, black_player, white_player, spectators)
-    IO.puts("handle_in game: ")
-    IO.inspect game
-
-    GameBackup.save(socket.assigns[:name], game)
-
-    socket = assign(socket, :game, game)
-    IO.inspect socket
-
-    broadcast socket, "toleaveGame", %{"game_state" => Game.client_view(game)}
-    {:noreply, socket}
-  end
-
   # When any user leaves the game
-  def handle_in("toleaveGame", %{}, socket) do
+  def handle_in("leaveGame", %{}, socket) do
     game_name = socket.assigns[:game_name]
-    user_name = socket.assigns[:user_name]
+    user = socket.assigns[:user]
     game = GameBackUp.load(game_name)
     status = game.status
 
     user_type = cond do
-      user_name == game.black_player ->
+      user == game.black_player ->
         :black_player
-      user_name == game.white_player ->
+      user == game.white_player ->
         :white_player
       true ->
         :spectator
     end
 
     # if game has no users, delete this game from GameBackUp
-    game = Game.userLeavesGame(game, user_type, user_name)
+    game = Game.userLeavesGame(game, user_type, user)
     GameBackUp.save(game_name, game)
 
-    if game.black_player == "" and game.white_player == "" and game.spectators == [] do
+    if game.black_player == nil and game.white_player == nil and game.spectators == [] do
       GameBackUp.remove(game_name)
     end
 
-    # if one of the players leaves the game, the other player wins
+    # if one of the players leaves the game, then the other player wins
     is_player = user_type == :black_player or user_type == :white_player
     if is_player and status == "Playing"  do
       GameBackUp.save(game_name, Map.put(game, :status, "Finished"))
@@ -80,29 +67,29 @@ defmodule OthelloWeb.GamesChannel do
     {:noreply, socket}
   end
 
-  def handle_in("tohandleClick", %{"id" => id}, socket) do
-    game = GameBackup.load(socket.assigns[:name])
-    game = Game.tohandleClick(game, id)
+  def handle_in("handleClick", %{"id" => id}, socket) do
+    game = GameBackup.load(socket.assigns[:game_name])
+    game = Game.handleClick(game, id)
     IO.puts("handle_in game: ")
     IO.inspect game
 
-    GameBackup.save(socket.assigns[:name], game)
+    GameBackup.save(socket.assigns[:game_name], game)
 
     socket = assign(socket, :game, game)
     IO.inspect socket
 
-    broadcast socket, "tohandleClick", %{"game_state" => Game.client_view(game)}
+    broadcast socket, "handleClick", %{"game_state" => Game.client_view(game)}
     {:noreply, socket}
   end
 
   def handle_in("tocheckAvailableMoves", %{"xWasNext" => xWasNext, "squares" => squares}, socket) do
-    game = GameBackup.load(socket.assigns[:name])
+    game = GameBackup.load(socket.assigns[:game_name])
     IO.puts "handle_in loaded game"
     IO.inspect game
     IO.puts "*******--------------------------------******"
 
     game = Game.tocheckAvailableMoves(game, xWasNext, squares)
-    GameBackup.save(socket.assigns[:name], game)
+    GameBackup.save(socket.assigns[:game_name], game)
 
     IO.inspect game
 
@@ -115,9 +102,9 @@ defmodule OthelloWeb.GamesChannel do
 
 
   def handle_in("tocheckAvailableMovesOpposite", %{"notxWasNext" => notxWasNext, "squares" => squares}, socket) do
-    game = GameBackup.load(socket.assigns[:name])
+    game = GameBackup.load(socket.assigns[:game_name])
     game = Game.tocheckAvailableMovesOpposite(game, notxWasNext, squares)
-    GameBackup.save(socket.assigns[:name], game)
+    GameBackup.save(socket.assigns[:game_name], game)
     socket = assign(socket, :game, game)
 
     broadcast socket, "tocheckAvailableMovesOpposite", %{"game_state" => Game.client_view(game)}
@@ -126,17 +113,31 @@ defmodule OthelloWeb.GamesChannel do
 
   def handle_in("toReset", %{}, socket) do
     game = Game.new()
-    GameBackup.save(socket.assigns[:name], game)
+    GameBackup.save(socket.assigns[:game_name], game)
     socket = assign(socket, :game, game)
 
     broadcast socket, "toReset", %{"game_state" => Game.client_view(game)}
     {:noreply, socket}
   end
 
-  def handle_in("send_msg", %{"user_name" => user_name, "msg" => msg}, socket) do
-    game = GameBackUp.load(socket.assigns[:name])
-    game = Game.send_msg(game, user_name, msg)
-    GameBackUp.save(socket.assigns[:name], game)
+  # Force switch player if current player has no valid moves
+  def handle_in("switch_player", _payload, socket) do
+    game = GameBackUp.load(socket.assigns[:game_name])
+    game = Game.switch_player(game)
+    GameBackUp.save(socket.assigns[:game_name], game)
+    if game.status == "Finished" do
+      broadcast! socket, "finish", %{"game_state" => Game.client_view(game)}
+      {:noreply, socket}
+    else
+      broadcast! socket, "move", %{"game_state" => Game.client_view(game)}
+      {:noreply, socket}
+    end
+  end
+
+  def handle_in("send_msg", %{"user" => user, "msg" => msg}, socket) do
+    game = GameBackUp.load(socket.assigns[:game_name])
+    game = Game.send_msg(game, user, msg)
+    GameBackUp.save(socket.assigns[:game_name], game)
     broadcast! socket, "new_msg", %{"game_state" => Game.client_view(game)}
     {:noreply, socket}
   end
