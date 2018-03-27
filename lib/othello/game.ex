@@ -25,7 +25,6 @@ defmodule Othello.Game do
       blackWasNext: true,
       blackIsNext: true,
       availableMoves: [],
-      availableMovesOpposite: [],
       black_player: nil,
       white_player: nil,
       spectators: [],
@@ -46,7 +45,6 @@ defmodule Othello.Game do
       blackWasNext: game.blackWasNext,
       blackIsNext: game.blackIsNext,
       availableMoves: game.availableMoves,
-      availableMovesOpposite: game.availableMovesOpposite,
       black_player: game.black_player,
       white_player: game.white_player,
       spectators: game.spectators,
@@ -414,14 +412,20 @@ defmodule Othello.Game do
         #IO.inspect shouldTurnColor
       end
     end
+
+      # switch player since the current player does not have valid moves
       if current_player == black_player do
         current_player = white_player
       else
         current_player = black_player
       end
+
+      if Enum.count(client_view(game).availableMoves) == 0 do
+        status = "Finished"
+      end
     end
 
-    %{game | squares: changedSquares, black_pieces: black_pieces, white_pieces: white_pieces, blackWasNext: shouldTurnColor, blackIsNext: shouldTurnColor, availableMoves: availableSquares, current_player: current_player}
+    %{game | squares: changedSquares, black_pieces: black_pieces, white_pieces: white_pieces, blackWasNext: shouldTurnColor, blackIsNext: shouldTurnColor, availableMoves: availableSquares, current_player: current_player, status: status}
   end
 
   @doc """

@@ -45736,6 +45736,11 @@ var Othello = function (_React$Component) {
                         'div',
                         { className: 'game-status' },
                         status
+                      ),
+                      _react2.default.createElement(
+                        'div',
+                        { className: 'game-status' },
+                        this.state.status
                       )
                     )
                   )

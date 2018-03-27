@@ -5,13 +5,8 @@ defmodule OthelloWeb.GamesChannel do
   alias Othello.GameBackup
 
   def join("games:" <> game_name, params, socket) do
-    IO.inspect params
-    IO.puts "INSIDE JOIN"
     # or the game has already started
     user = params["user"]
-    IO.inspect user
-
-    IO.puts "*_*_*_*_*_*_"
     game = GameBackup.load(game_name) || Game.new()
     game = Game.join(game, user)
 

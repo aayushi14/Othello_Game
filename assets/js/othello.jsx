@@ -23,8 +23,7 @@ class Othello extends React.Component {
       white_pieces: 2,                // number of white color pieces
       blackWasNext: true,             // black player's turn was next
       blackIsNext: true,              // black player's turn iss next
-      availableMoves: [],             // the available moves for black player (current)
-      availableMovesOpposite: [],     // the available moves for white player
+      availableMoves: [],             // the available moves for current player
       black_player: null,             // name of the player with black colored pieces
       white_player: null,             // name of the player with white colored pieces
       spectators: [],                 // the list of spectators
@@ -214,6 +213,7 @@ class Othello extends React.Component {
                       <div>White markers: {this.state.white_pieces}</div>
                       <br />
                       <div className="game-status">{status}</div>
+                      <div className="game-status">{this.state.status}</div>
                     </div>
                   </div>
                 </div>

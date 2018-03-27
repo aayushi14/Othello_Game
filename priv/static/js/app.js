@@ -45443,8 +45443,7 @@ var Othello = function (_React$Component) {
       white_pieces: 2, // number of white color pieces
       blackWasNext: true, // black player's turn was next
       blackIsNext: true, // black player's turn iss next
-      availableMoves: [], // the available moves for black player (current)
-      availableMovesOpposite: [], // the available moves for white player
+      availableMoves: [], // the available moves for current player
       black_player: null, // name of the player with black colored pieces
       white_player: null, // name of the player with white colored pieces
       spectators: [], // the list of spectators
@@ -45736,6 +45735,11 @@ var Othello = function (_React$Component) {
                         'div',
                         { className: 'game-status' },
                         status
+                      ),
+                      _react2.default.createElement(
+                        'div',
+                        { className: 'game-status' },
+                        this.state.status
                       )
                     )
                   )
