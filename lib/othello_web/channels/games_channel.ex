@@ -82,13 +82,13 @@ defmodule OthelloWeb.GamesChannel do
     {:noreply, socket}
   end
 
-  def handle_in("tocheckAvailableMoves", %{"xWasNext" => xWasNext, "squares" => squares}, socket) do
+  def handle_in("tocheckAvailableMoves", %{"blackWasNext" => blackWasNext, "squares" => squares}, socket) do
     game = GameBackup.load(socket.assigns[:game_name])
     IO.puts "handle_in loaded game"
     IO.inspect game
     IO.puts "*******--------------------------------******"
 
-    game = Game.tocheckAvailableMoves(game, xWasNext, squares)
+    game = Game.tocheckAvailableMoves(game, blackWasNext, squares)
     GameBackup.save(socket.assigns[:game_name], game)
 
     IO.inspect game

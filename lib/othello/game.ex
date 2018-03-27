@@ -22,8 +22,8 @@ defmodule Othello.Game do
       squares: initSquares,
       black_pieces: 2,
       white_pieces: 2,
-      xWasNext: true,
-      xIsNext: true,
+      blackWasNext: true,
+      blackIsNext: true,
       availableMoves: [],
       availableMovesOpposite: [],
       black_player: nil,
@@ -43,8 +43,8 @@ defmodule Othello.Game do
       squares: game.squares,
       black_pieces: game.black_pieces,
       white_pieces: game.white_pieces,
-      xWasNext: game.xWasNext,
-      xIsNext: game.xIsNext,
+      blackWasNext: game.blackWasNext,
+      blackIsNext: game.blackIsNext,
       availableMoves: game.availableMoves,
       availableMovesOpposite: game.availableMovesOpposite,
       black_player: game.black_player,
@@ -152,16 +152,16 @@ defmodule Othello.Game do
   end
 
   # initiates the recusion over y (acts like for loop)
-  def for_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when is_integer(y) do
-    flippedSquares = infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
+  def for_loop(y, offset, lastXpos, lastYpos, flippedSquares, blackIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when is_integer(y) do
+    flippedSquares = infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, blackIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
     flippedSquares
   end
 
   # recursive call until y becomes greater than or equal to 64
-  defp infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when y >= 64, do: modifiedBoard
+  defp infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, blackIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when y >= 64, do: modifiedBoard
 
   # recursive call until y is less than 64
-  defp infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when y < 64 do
+  defp infor_loop(y, offset, lastXpos, lastYpos, flippedSquares, blackIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY) when y < 64 do
     # IO.puts "INSIDE infor_loop: "
     # Calculate the row and col of the current square
     {xPos, yPos} = {rem(y,8), div((y - rem(y,8)),8)}
@@ -174,13 +174,13 @@ defmodule Othello.Game do
     else
       IO.puts "else of FIX board flippedSquares: "
       IO.inspect flippedSquares
-      IO.inspect xIsNext
+      IO.inspect blackIsNext
       #  IO.puts "in else of infor_loop just before COND"
       IO.inspect Enum.at(flippedSquares, y)
       cond do
         # Next square was occupied with the opposite color
-        Enum.at(flippedSquares, y) === (if !xIsNext, do: "X", else: "O") ->
-          sq = if xIsNext, do: "X", else: "O"
+        Enum.at(flippedSquares, y) === (if !blackIsNext, do: "X", else: "O") ->
+          sq = if blackIsNext, do: "X", else: "O"
            IO.puts "first cond sq: replacing position with sq "
            IO.inspect sq
           flippedSquares = List.replace_at(flippedSquares, y, sq)
@@ -192,10 +192,10 @@ defmodule Othello.Game do
           # IO.puts "first cond calling for_loop, y and offset:"
           # IO.inspect y
           # IO.inspect offset
-          flippedSquares = infor_loop(y + offset, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
+          flippedSquares = infor_loop(y + offset, offset, lastXpos, lastYpos, flippedSquares, blackIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
         # Next square was occupied with the same color
-        ((Enum.at(flippedSquares, y) === (if xIsNext, do: "X", else: "O")) && atleastOneMarkIsFlipped)  ->
-          sq = if xIsNext, do: "X", else: "O"
+        ((Enum.at(flippedSquares, y) === (if blackIsNext, do: "X", else: "O")) && atleastOneMarkIsFlipped)  ->
+          sq = if blackIsNext, do: "X", else: "O"
            IO.puts "second cond sq: replacing position with: "
            IO.inspect sq
           flippedSquares = List.replace_at(flippedSquares, position, sq)
@@ -204,14 +204,14 @@ defmodule Othello.Game do
           # IO.inspect flippedSquares
           # IO.puts "inside same color modifiedBoard: "
           # IO.inspect modifiedBoard
-          flippedSquares = foreach_loop(offset, squares, position, xIsNext, modifiedBoard, startX, startY)
+          flippedSquares = foreach_loop(offset, squares, position, blackIsNext, modifiedBoard, startX, startY)
           # IO.puts "second cond after in infor flippedSquares: "
           # IO.inspect flippedSquares
           flippedSquares
         true ->
            IO.puts "true offset: "
            IO.inspect offset
-          flippedSquares = foreach_loop(offset, squares, position, xIsNext, modifiedBoard, startX, startY)
+          flippedSquares = foreach_loop(offset, squares, position, blackIsNext, modifiedBoard, startX, startY)
           # IO.puts "if true in cond of infor flippedSquares: "
           # IO.inspect flippedSquares
           flippedSquares
@@ -242,7 +242,7 @@ defmodule Othello.Game do
   end
 
   # for each offset around the current index
-  def foreach_loop(offset, squares, position, xIsNext, modifiedBoard, startX, startY) do
+  def foreach_loop(offset, squares, position, blackIsNext, modifiedBoard, startX, startY) do
     IO.puts "INSIDE foreach_loop:"
     IO.puts "position:"
     IO.inspect position
@@ -258,7 +258,7 @@ defmodule Othello.Game do
       IO.inspect offset
       if offset != "ok" do
         y = position + offset
-        flippedSquares = for_loop(y, offset, lastXpos, lastYpos, flippedSquares, xIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
+        flippedSquares = for_loop(y, offset, lastXpos, lastYpos, flippedSquares, blackIsNext, atleastOneMarkIsFlipped, squares, position, modifiedBoard, startX, startY)
         flippedSquares
       else
         flippedSquares
@@ -274,7 +274,7 @@ defmodule Othello.Game do
   returns a modified board after flipping the square,
   filling it with black or white piece
   """
-  def flipSquares(squares, position, xIsNext) do
+  def flipSquares(squares, position, blackIsNext) do
     #IO.puts "INSIDE flipSquares"
     modifiedBoard = nil
 
@@ -297,7 +297,7 @@ defmodule Othello.Game do
       modifiedBoard = nil
     else
       # Iterate all directions, these numbers are the offsets in the array to reach next square
-      modifiedBoard = foreach_loop(0, squares, position, xIsNext, modifiedBoard, startX, startY)
+      modifiedBoard = foreach_loop(0, squares, position, blackIsNext, modifiedBoard, startX, startY)
     end
 
     #IO.puts "INSIDE flipSquares modifiedBoard: "
@@ -376,19 +376,25 @@ defmodule Othello.Game do
     squares = game.squares
     black_pieces = game.black_pieces
     white_pieces = game.white_pieces
-    xWasNext = game.xWasNext
-    xIsNext = game.xIsNext
+    blackWasNext = game.blackWasNext
+    blackIsNext = game.blackIsNext
     black_player = game.black_player
     white_player = game.white_player
     current_player= game.current_player
     availableMoves = game.availableMoves
 
+    if !Enum.member?(availableMoves, id) do
+      changedSquares = squares
+      shouldTurnColor = blackWasNext
+      shouldTurnColor = blackIsNext
+      availableSquares = game.availableMoves
+    else
     if calculateWinner(black_pieces, white_pieces) || Enum.at(squares,id) do
       # IO.puts "handleClick calculateWinner"
       changedSquares = squares
     else
       # IO.puts "else handleClick"
-      changedSquares = flipSquares(squares, id, xIsNext)
+      changedSquares = flipSquares(squares, id, blackIsNext)
       if changedSquares === nil do
         # IO.puts "else, if, handleClick"
         changedSquares = squares
@@ -396,36 +402,26 @@ defmodule Othello.Game do
         # IO.puts "else, if, else, handleClick"
         black_pieces = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "X", do: acc + 1, else: acc) end)
         white_pieces = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "O", do: acc + 1, else: acc) end)
-        IO.puts "xIsNext----------------------------------------"
-        IO.inspect !xIsNext
+        IO.puts "blackIsNext----------------------------------------"
+        IO.inspect !blackIsNext
         IO.puts "changedSquares--------------------------------"
         IO.inspect changedSquares
-        availableSquares = checkAvailableMoves( !xIsNext, changedSquares)
-        shouldTurnColor = if length(availableSquares) > 0, do: !xIsNext, else: xIsNext
+        availableSquares = checkAvailableMoves( !blackIsNext, changedSquares)
+        shouldTurnColor = if length(availableSquares) > 0, do: !blackIsNext, else: blackIsNext
         IO.puts "availableSquares--------"
         IO.inspect availableSquares
         #IO.puts "shouldTurnColor--------------------------------"
         #IO.inspect shouldTurnColor
       end
     end
-
-    # IO.puts "black_player"
-    # IO.inspect black_player
-    # IO.puts "white_player"
-    # IO.inspect white_player
-    # IO.puts "current_player"
-    # IO.inspect current_player
-    # IO.puts "*******************************"
-
-    if current_player == black_player do
-      current_player = white_player
-    else
-      current_player = black_player
+      if current_player == black_player do
+        current_player = white_player
+      else
+        current_player = black_player
+      end
     end
-    IO.puts "current_player"
-    IO.inspect current_player
 
-    %{game | availableMoves: availableSquares, squares: changedSquares, black_pieces: black_pieces, white_pieces: white_pieces, xWasNext: shouldTurnColor, xIsNext: shouldTurnColor, current_player: current_player}
+    %{game | squares: changedSquares, black_pieces: black_pieces, white_pieces: white_pieces, blackWasNext: shouldTurnColor, blackIsNext: shouldTurnColor, availableMoves: availableSquares, current_player: current_player}
   end
 
   @doc """

@@ -20,17 +20,17 @@ class Othello extends React.Component {
     this.state = {
       squares: initSquares,
       black_pieces: 2,                // number of black color pieces
-      white_pieces: 2,                     // number of white color pieces
-      xWasNext: true,                  // black player's turn was next
-      xIsNext: true,                   // black player's turn iss next
-      availableMoves: [],              // the available moves for black player (current)
-      availableMovesOpposite: [],      // the available moves for white player
-      black_player: null,                // name of the player with black colored pieces
-      white_player: null,                // name of the player with white colored pieces
-      spectators: [],                  // the list of spectators
-      current_player: null,              // black player moves first
-      msgs: [],                        // list of messages
-      status: "Waiting",               // status of the game
+      white_pieces: 2,                // number of white color pieces
+      blackWasNext: true,             // black player's turn was next
+      blackIsNext: true,              // black player's turn iss next
+      availableMoves: [],             // the available moves for black player (current)
+      availableMovesOpposite: [],     // the available moves for white player
+      black_player: null,             // name of the player with black colored pieces
+      white_player: null,             // name of the player with white colored pieces
+      spectators: [],                 // the list of spectators
+      current_player: null,           // black player moves first
+      msgs: [],                       // list of messages
+      status: "Waiting",              // status of the game
     };
 
     // join the channel
@@ -110,8 +110,8 @@ class Othello extends React.Component {
     this.channel.push("handleClick", {id: id});
   }
 
-  checkAvailableMoves(xWasNext, squares) {
-    this.channel.push("tocheckAvailableMoves", {xWasNext: xWasNext, squares: squares})
+  checkAvailableMoves(blackWasNext, squares) {
+    this.channel.push("tocheckAvailableMoves", {blackWasNext: blackWasNext, squares: squares})
      .receive("ok", this.gotView.bind(this));
   }
 
@@ -125,10 +125,10 @@ class Othello extends React.Component {
 
   componentWillMount() {
     if(this.state.black_player == this.state.current_player ) {
-    this.channel.push("tocheckAvailableMoves", {xWasNext: this.state.xWasNext, squares: this.state.squares})
+    this.channel.push("tocheckAvailableMoves", {blackWasNext: this.state.blackWasNext, squares: this.state.squares})
     .receive("ok", this.gotView.bind(this));
     } else if (this.state.white_player == this.state.current_player ){
-    this.channel.push("tocheckAvailableMoves", {xWasNext: !this.state.xWasNext, squares: this.state.squares})
+    this.channel.push("tocheckAvailableMoves", {blackWasNext: !this.state.blackWasNext, squares: this.state.squares})
     .receive("ok", this.gotView.bind(this));
     }
   }
@@ -141,8 +141,10 @@ class Othello extends React.Component {
 
   render() {
 
-    let status =
-      		[this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
+    if (this.state.availableMoves != []) {
+      let status =
+            [this.state.blackIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
+    }
 
     let black_player_status = null;
     let white_player_status = null;

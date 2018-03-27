@@ -45441,8 +45441,8 @@ var Othello = function (_React$Component) {
       squares: initSquares,
       black_pieces: 2, // number of black color pieces
       white_pieces: 2, // number of white color pieces
-      xWasNext: true, // black player's turn was next
-      xIsNext: true, // black player's turn iss next
+      blackWasNext: true, // black player's turn was next
+      blackIsNext: true, // black player's turn iss next
       availableMoves: [], // the available moves for black player (current)
       availableMovesOpposite: [], // the available moves for white player
       black_player: null, // name of the player with black colored pieces
@@ -45534,8 +45534,8 @@ var Othello = function (_React$Component) {
     }
   }, {
     key: 'checkAvailableMoves',
-    value: function checkAvailableMoves(xWasNext, squares) {
-      this.channel.push("tocheckAvailableMoves", { xWasNext: xWasNext, squares: squares }).receive("ok", this.gotView.bind(this));
+    value: function checkAvailableMoves(blackWasNext, squares) {
+      this.channel.push("tocheckAvailableMoves", { blackWasNext: blackWasNext, squares: squares }).receive("ok", this.gotView.bind(this));
     }
 
     // send message in the chat room
@@ -45552,9 +45552,9 @@ var Othello = function (_React$Component) {
     key: 'componentWillMount',
     value: function componentWillMount() {
       if (this.state.black_player == this.state.current_player) {
-        this.channel.push("tocheckAvailableMoves", { xWasNext: this.state.xWasNext, squares: this.state.squares }).receive("ok", this.gotView.bind(this));
+        this.channel.push("tocheckAvailableMoves", { blackWasNext: this.state.blackWasNext, squares: this.state.squares }).receive("ok", this.gotView.bind(this));
       } else if (this.state.white_player == this.state.current_player) {
-        this.channel.push("tocheckAvailableMoves", { xWasNext: !this.state.xWasNext, squares: this.state.squares }).receive("ok", this.gotView.bind(this));
+        this.channel.push("tocheckAvailableMoves", { blackWasNext: !this.state.blackWasNext, squares: this.state.squares }).receive("ok", this.gotView.bind(this));
       }
     }
   }, {
@@ -45571,7 +45571,9 @@ var Othello = function (_React$Component) {
     value: function render() {
       var _this3 = this;
 
-      var status = [this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
+      if (this.state.availableMoves != []) {
+        var _status = [this.state.blackIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
+      }
 
       var black_player_status = null;
       var white_player_status = null;
