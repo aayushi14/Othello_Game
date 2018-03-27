@@ -45537,11 +45537,6 @@ var Othello = function (_React$Component) {
     value: function checkAvailableMoves(xWasNext, squares) {
       this.channel.push("tocheckAvailableMoves", { xWasNext: xWasNext, squares: squares }).receive("ok", this.gotView.bind(this));
     }
-  }, {
-    key: 'checkAvailableMovesOpposite',
-    value: function checkAvailableMovesOpposite(notxWasNext, squares) {
-      this.channel.push("tocheckAvailableMovesOpposite", { notxWasNext: notxWasNext, squares: squares }).receive("ok", this.gotView.bind(this));
-    }
 
     // send message in the chat room
 
@@ -45575,13 +45570,6 @@ var Othello = function (_React$Component) {
     key: 'render',
     value: function render() {
       var _this3 = this;
-
-      console.log("INSIDE render: ");
-      this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
-      console.log("availableMoves: " + this.state.availableMoves);
-
-      this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
-      console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
 
       var status = [this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
 

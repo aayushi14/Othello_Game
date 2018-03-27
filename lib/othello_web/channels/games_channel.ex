@@ -100,17 +100,6 @@ defmodule OthelloWeb.GamesChannel do
     {:noreply, socket}
   end
 
-
-  def handle_in("tocheckAvailableMovesOpposite", %{"notxWasNext" => notxWasNext, "squares" => squares}, socket) do
-    game = GameBackup.load(socket.assigns[:game_name])
-    game = Game.tocheckAvailableMovesOpposite(game, notxWasNext, squares)
-    GameBackup.save(socket.assigns[:game_name], game)
-    socket = assign(socket, :game, game)
-
-    broadcast socket, "tocheckAvailableMovesOpposite", %{"game_state" => Game.client_view(game)}
-    {:noreply, socket}
-  end
-
   def handle_in("toReset", %{}, socket) do
     game = Game.new()
     GameBackup.save(socket.assigns[:game_name], game)

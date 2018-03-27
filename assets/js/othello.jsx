@@ -115,11 +115,6 @@ class Othello extends React.Component {
      .receive("ok", this.gotView.bind(this));
   }
 
-  checkAvailableMovesOpposite(notxWasNext, squares) {
-    this.channel.push("tocheckAvailableMovesOpposite", {notxWasNext: notxWasNext, squares: squares})
-     .receive("ok", this.gotView.bind(this));
-  }
-
   // send message in the chat room
   send_msg(e) {
     let chatInput = document.querySelector("#chatInput");
@@ -145,12 +140,6 @@ class Othello extends React.Component {
   }
 
   render() {
-    console.log("INSIDE render: ");
-    this.checkAvailableMoves(this.state.xWasNext, this.state.squares);
-    console.log("availableMoves: " + this.state.availableMoves);
-
-    this.checkAvailableMovesOpposite(!this.state.xWasNext, this.state.squares);
-    console.log("availableMovesOpposite: " + this.state.availableMovesOpposite);
 
     let status =
       		[this.state.xIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
