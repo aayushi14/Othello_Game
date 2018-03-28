@@ -65,32 +65,17 @@ defmodule OthelloWeb.GamesChannel do
   def handle_in("handleClick", %{"id" => id}, socket) do
     game = GameBackup.load(socket.assigns[:game_name])
     game = Game.handleClick(game, id)
-    IO.puts("handle_in game: ")
-    IO.inspect game
-
     GameBackup.save(socket.assigns[:game_name], game)
-
     socket = assign(socket, :game, game)
-    IO.inspect socket
-
     broadcast socket, "handleClick", %{"game_state" => Game.client_view(game)}
     {:noreply, socket}
   end
 
   def handle_in("tocheckAvailableMoves", %{"blackWasNext" => blackWasNext, "squares" => squares}, socket) do
     game = GameBackup.load(socket.assigns[:game_name])
-    IO.puts "handle_in loaded game"
-    IO.inspect game
-    IO.puts "*******--------------------------------******"
-
     game = Game.tocheckAvailableMoves(game, blackWasNext, squares)
     GameBackup.save(socket.assigns[:game_name], game)
-
-    IO.inspect game
-
-    IO.puts "AFTER tocheckAvailableMoves"
     socket = assign(socket, :game, game)
-
     broadcast socket, "tocheckAvailableMoves", %{"game_state" => Game.client_view(game)}
     {:noreply, socket}
   end

@@ -13,7 +13,6 @@ class Othello extends React.Component {
     super(props);
     this.channel = props.channel;
     this.user_name = props.channel.params.user;
-    console.log(this.user_name)
 
     const initSquares = Array(64).fill(null);
     [initSquares[8 * 3 + 3], initSquares[8 * 3 + 4], initSquares[8 * 4 + 4], initSquares[8 * 4 + 3]] = ["X", "O", "X", "O"];
@@ -102,8 +101,6 @@ class Othello extends React.Component {
 
   gotView(view) {
     this.setState(view.game);
-    console.log("gotView: ");
-    console.log(view.game);
   }
 
   leaveGame() {
@@ -112,8 +109,6 @@ class Othello extends React.Component {
   }
 
   handleClick(id) {
-    console.log("Inside handleClick");
-    console.log(this.state);
     this.channel.push("handleClick", {id: id});
   }
 
@@ -126,7 +121,6 @@ class Othello extends React.Component {
   send_msg(e) {
     let chatInput = document.querySelector("#chatInput");
     let msg = chatInput.value;
-    console.log(this.user_name)
     this.channel.push("send_msg", { user_name: this.user_name, msg: msg });
     chatInput.value = "";
   }
