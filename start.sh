@@ -3,5 +3,5 @@
 export PORT=5114
 
 cd ~/www/Othello_Game
-./bin/othello stop || true
-./bin/othello start
+./bin/Othello_Game stop || true
+./bin/Othello_Game start
