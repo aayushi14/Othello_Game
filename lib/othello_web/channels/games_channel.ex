@@ -30,7 +30,7 @@ defmodule OthelloWeb.GamesChannel do
   def handle_in("leaveGame", %{}, socket) do
     game_name = socket.assigns[:game_name]
     user = socket.assigns[:user]
-    game = GameBackUp.load(game_name)
+    game = GameBackup.load(game_name)
     status = game.status
 
     user_type = cond do
@@ -42,18 +42,18 @@ defmodule OthelloWeb.GamesChannel do
         :spectator
     end
 
-    # if game has no users, delete this game from GameBackUp
+    # if game has no users, delete this game from GameBackup
     game = Game.userLeavesGame(game, user_type, user)
-    GameBackUp.save(game_name, game)
+    GameBackup.save(game_name, game)
 
     if game.black_player == nil and game.white_player == nil and game.spectators == [] do
-      GameBackUp.remove(game_name)
+      GameBackup.remove(game_name)
     end
 
     # if one of the players leaves the game, then the other player wins
     is_player = user_type == :black_player or user_type == :white_player
     if is_player and status == "Playing"  do
-      GameBackUp.save(game_name, Map.put(game, :status, "Finished"))
+      GameBackup.save(game_name, Map.put(game, :status, "Finished"))
       broadcast! socket, "left_game", %{"game_state" => Game.client_view(game)}
     # else just update the status
     else
@@ -106,9 +106,9 @@ defmodule OthelloWeb.GamesChannel do
 
   # Force switch player if current player has no valid moves
   def handle_in("switch_player", _payload, socket) do
-    game = GameBackUp.load(socket.assigns[:game_name])
+    game = GameBackup.load(socket.assigns[:game_name])
     game = Game.switch_player(game)
-    GameBackUp.save(socket.assigns[:game_name], game)
+    GameBackup.save(socket.assigns[:game_name], game)
     if game.status == "Finished" do
       broadcast! socket, "finish", %{"game_state" => Game.client_view(game)}
       {:noreply, socket}
@@ -118,10 +118,10 @@ defmodule OthelloWeb.GamesChannel do
     end
   end
 
-  def handle_in("send_msg", %{"user" => user, "msg" => msg}, socket) do
-    game = GameBackUp.load(socket.assigns[:game_name])
-    game = Game.send_msg(game, user, msg)
-    GameBackUp.save(socket.assigns[:game_name], game)
+  def handle_in("send_msg", %{"user_name" => user_name, "msg" => msg}, socket) do
+    game = GameBackup.load(socket.assigns[:game_name])
+    game = Game.send_msg(game, user_name, msg)
+    GameBackup.save(socket.assigns[:game_name], game)
     broadcast! socket, "new_msg", %{"game_state" => Game.client_view(game)}
     {:noreply, socket}
   end

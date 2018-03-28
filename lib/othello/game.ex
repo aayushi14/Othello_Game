@@ -38,6 +38,7 @@ defmodule Othello.Game do
   Initialize the board
   """
   def client_view(game) do
+    IO.inspect(game)
     %{
       squares: game.squares,
       black_pieces: game.black_pieces,
@@ -369,8 +370,6 @@ defmodule Othello.Game do
   as per the actions of current player click
   """
   def handleClick(game, id) do
-    IO.puts "INSIDE---------------------handleClick"
-    IO.inspect(game.squares)
     squares = game.squares
     black_pieces = game.black_pieces
     white_pieces = game.white_pieces
@@ -387,31 +386,31 @@ defmodule Othello.Game do
       shouldTurnColor = blackIsNext
       availableSquares = game.availableMoves
     else
-    if calculateWinner(black_pieces, white_pieces) || Enum.at(squares,id) do
-      # IO.puts "handleClick calculateWinner"
-      changedSquares = squares
-    else
-      # IO.puts "else handleClick"
-      changedSquares = flipSquares(squares, id, blackIsNext)
-      if changedSquares === nil do
-        # IO.puts "else, if, handleClick"
+      if calculateWinner(black_pieces, white_pieces) || Enum.at(squares,id) do
+        # IO.puts "handleClick calculateWinner"
         changedSquares = squares
       else
-        # IO.puts "else, if, else, handleClick"
-        black_pieces = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "X", do: acc + 1, else: acc) end)
-        white_pieces = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "O", do: acc + 1, else: acc) end)
-        IO.puts "blackIsNext----------------------------------------"
-        IO.inspect !blackIsNext
-        IO.puts "changedSquares--------------------------------"
-        IO.inspect changedSquares
-        availableSquares = checkAvailableMoves( !blackIsNext, changedSquares)
-        shouldTurnColor = if length(availableSquares) > 0, do: !blackIsNext, else: blackIsNext
-        IO.puts "availableSquares--------"
-        IO.inspect availableSquares
-        #IO.puts "shouldTurnColor--------------------------------"
-        #IO.inspect shouldTurnColor
+        # IO.puts "else handleClick"
+        changedSquares = flipSquares(squares, id, blackIsNext)
+        if changedSquares === nil do
+          # IO.puts "else, if, handleClick"
+          changedSquares = squares
+        else
+          # IO.puts "else, if, else, handleClick"
+          black_pieces = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "X", do: acc + 1, else: acc) end)
+          white_pieces = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "O", do: acc + 1, else: acc) end)
+          IO.puts "blackIsNext----------------------------------------"
+          IO.inspect !blackIsNext
+          IO.puts "changedSquares--------------------------------"
+          IO.inspect changedSquares
+          availableSquares = checkAvailableMoves( !blackIsNext, changedSquares)
+          shouldTurnColor = if length(availableSquares) > 0, do: !blackIsNext, else: blackIsNext
+          IO.puts "availableSquares--------"
+          IO.inspect availableSquares
+          #IO.puts "shouldTurnColor--------------------------------"
+          #IO.inspect shouldTurnColor
+        end
       end
-    end
 
       # switch player since the current player does not have valid moves
       if current_player == black_player do

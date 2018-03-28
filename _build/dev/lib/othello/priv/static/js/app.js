@@ -45427,7 +45427,8 @@ var Othello = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (Othello.__proto__ || Object.getPrototypeOf(Othello)).call(this, props));
 
     _this.channel = props.channel;
-    _this.user_name = props.channel.params.user_name;
+    _this.user_name = props.channel.params.user;
+    console.log(_this.user_name);
 
     var initSquares = Array(64).fill(null);
     var _ref = ["X", "O", "X", "O"];
@@ -45443,8 +45444,7 @@ var Othello = function (_React$Component) {
       white_pieces: 2, // number of white color pieces
       blackWasNext: true, // black player's turn was next
       blackIsNext: true, // black player's turn iss next
-      availableMoves: [], // the available moves for black player (current)
-      availableMovesOpposite: [], // the available moves for white player
+      availableMoves: [], // the available moves for current player
       black_player: null, // name of the player with black colored pieces
       white_player: null, // name of the player with white colored pieces
       spectators: [], // the list of spectators
@@ -45545,6 +45545,7 @@ var Othello = function (_React$Component) {
     value: function send_msg(e) {
       var chatInput = document.querySelector("#chatInput");
       var msg = chatInput.value;
+      console.log(this.user_name);
       this.channel.push("send_msg", { user_name: this.user_name, msg: msg });
       chatInput.value = "";
     }

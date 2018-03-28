@@ -2,7 +2,7 @@
 
 export PORT=5114
 export MIX_ENV=prod
-export GIT_PATH=/home/Othello_Game/Othello_Game
+export GIT_PATH=/home/othello/othello
 
 PWD=`pwd`
 if [ $PWD != $GIT_PATH ]; then
@@ -27,17 +27,17 @@ mkdir -p ~/www
 mkdir -p ~/old
 
 NOW=`date +%s`
-if [ -d ~/www/Othello_Game ]; then
-	echo mv ~/www/Othello_Game ~/old/$NOW
-	mv ~/www/Othello_Game ~/old/$NOW
+if [ -d ~/www/othello ]; then
+	echo mv ~/www/othello ~/old/$NOW
+	mv ~/www/othello ~/old/$NOW
 fi
 
-mkdir -p ~/www/Othello_Game
-REL_TAR=~/Othello_Game/_build/prod/rel/othello/releases/0.0.1/othello.tar.gz
-(cd ~/www/Othello_Game && tar xzvf $REL_TAR)
+mkdir -p ~/www/othello
+REL_TAR=~/othello/_build/prod/rel/othello/releases/0.0.1/othello.tar.gz
+(cd ~/www/othello && tar xzvf $REL_TAR)
 
 crontab - <<CRONTAB
-@reboot bash /home/othello/Othello_Game/start.sh
+@reboot bash /home/othello/othello/start.sh
 CRONTAB
 
 #. start.sh
