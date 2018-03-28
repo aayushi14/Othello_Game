@@ -6,12 +6,16 @@
 <nav class="navbar fixed-top navbar-dark bg-dark justify-content-center" role="navigation">
   <h1 class="navbar-brand disabled">Othello Game:  <%= @game %></h1>
 </nav>
-<br /><br /><br /><br />
+<br /><br /><br />
 
 <%# Game display target %>
 <div id="root">
   <p>React app not loaded...</p>
 </div>
+
+<nav class="navbar fixed-bottom navbar-light bg-light justify-content-end" role="navigation">
+  <p class="navbar-brand disabled">&copy; Aayushi, Arcy</p>
+</nav>
 
 <!-- The Modal -->
 <div class="modal" id="gameOverModal" role="dialog">

@@ -49,7 +49,14 @@ class Othello extends React.Component {
 
     // listener for clicking on a square
     this.channel.on("handleClick", payload => {
-      this.setState(payload.game_state);
+      let game_state = payload.game_state;
+      this.setState(game_state);
+
+      if (game_state.availableMoves == []) {
+        let channel = this.channel;
+        let switch_player_func = function() { channel.push("switch_player", { }) };
+        setTimeout(switch_player_func, 500);
+      }
     });
 
     // listener for game finish
@@ -142,9 +149,10 @@ class Othello extends React.Component {
 
   render() {
 
+    let status = null;
     if (this.state.availableMoves != []) {
-      let status =
-            [this.state.blackIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
+      status =
+      [this.state.blackIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
     }
 
     let black_player_status = null;
@@ -214,8 +222,7 @@ class Othello extends React.Component {
                       <div>Black markers: {this.state.black_pieces}</div>
                       <div>White markers: {this.state.white_pieces}</div>
                       <br />
-                      <div className="game-status">{status}</div>
-                      <div className="game-status">{this.state.status}</div>
+                      <div className="game-status">{this.state.status} : {status}</div>
                     </div>
                   </div>
                 </div>

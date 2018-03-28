@@ -20,13 +20,9 @@
   border-bottom: 2px solid black;
 }
 
-// #new_game {
-//   background-color: #EBEBF0;
-//   border: 5px dashed gray;
-// }
- .btn {
+.btn {
   width: 150px;
- }
+}
 
 .card {
   //width: 20%;
@@ -91,21 +87,6 @@
   border: 1px solid #cccccc;
 }
 
-// button, .submit {
-//     background-color: #000066;
-//     padding: 10px 30px;
-//     margin: 1px 1px;
-//     width: 220px;
-//     font: 20px "Georgia", Futura, serif;
-//     color: #ebebf0;
-//     cursor: pointer;
-// }
-//
-// button:hover, .submit:hover {
-//   background-color: #ebebf0;
-//   color: #000066;
-// }
-
 /* Global settings */
 
 body {
@@ -120,7 +101,12 @@ ol, ul {
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+  padding-left: 5px;
+  padding-right: 5px;
 }
+
+.navbar {
+  padding: 0rem 0rem; }
 
 /* Main game page settings */
 
@@ -276,7 +262,7 @@ ol, ul {
 #chatInput {
   width: 195%;
   float: left;
-  margin-left: -17%;
+  margin-left: -15%;
 }
 
 .systemMsg {
@@ -298,6 +284,6 @@ ol, ul {
   border-radius: 5px;
   color: white;
   margin-right: -15%;
-  width: 70%;
+  width: 90%;
   height: 30px;
 }

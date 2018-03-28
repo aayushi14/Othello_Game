@@ -45468,7 +45468,16 @@ var Othello = function (_React$Component) {
 
     // listener for clicking on a square
     _this.channel.on("handleClick", function (payload) {
-      _this.setState(payload.game_state);
+      var game_state = payload.game_state;
+      _this.setState(game_state);
+
+      if (game_state.availableMoves == []) {
+        var channel = _this.channel;
+        var switch_player_func = function switch_player_func() {
+          channel.push("switch_player", {});
+        };
+        setTimeout(switch_player_func, 500);
+      }
     });
 
     // listener for game finish
@@ -45572,8 +45581,9 @@ var Othello = function (_React$Component) {
     value: function render() {
       var _this3 = this;
 
+      var status = null;
       if (this.state.availableMoves != []) {
-        var _status = [this.state.blackIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
+        status = [this.state.blackIsNext ? 'Black\'s turn' : 'White\'s turn', ' with ', this.state.availableMoves.length, ' available moves.'].join('');
       }
 
       var black_player_status = null;
@@ -45736,12 +45746,9 @@ var Othello = function (_React$Component) {
                       _react2.default.createElement(
                         'div',
                         { className: 'game-status' },
+                        this.state.status,
+                        ' : ',
                         status
-                      ),
-                      _react2.default.createElement(
-                        'div',
-                        { className: 'game-status' },
-                        this.state.status
                       )
                     )
                   )

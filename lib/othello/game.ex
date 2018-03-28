@@ -375,9 +375,6 @@ defmodule Othello.Game do
     white_pieces = game.white_pieces
     blackWasNext = game.blackWasNext
     blackIsNext = game.blackIsNext
-    black_player = game.black_player
-    white_player = game.white_player
-    current_player= game.current_player
     availableMoves = game.availableMoves
 
     if !Enum.member?(availableMoves, id) do
@@ -399,32 +396,35 @@ defmodule Othello.Game do
           # IO.puts "else, if, else, handleClick"
           black_pieces = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "X", do: acc + 1, else: acc) end)
           white_pieces = Enum.reduce(changedSquares, 0, fn(current, acc) -> (if current === "O", do: acc + 1, else: acc) end)
-          IO.puts "blackIsNext----------------------------------------"
-          IO.inspect !blackIsNext
-          IO.puts "changedSquares--------------------------------"
-          IO.inspect changedSquares
           availableSquares = checkAvailableMoves( !blackIsNext, changedSquares)
           shouldTurnColor = if length(availableSquares) > 0, do: !blackIsNext, else: blackIsNext
-          IO.puts "availableSquares--------"
-          IO.inspect availableSquares
-          #IO.puts "shouldTurnColor--------------------------------"
-          #IO.inspect shouldTurnColor
         end
       end
 
-      # switch player since the current player does not have valid moves
-      if current_player == black_player do
-        current_player = white_player
-      else
-        current_player = black_player
-      end
-
-      if Enum.count(client_view(game).availableMoves) == 0 do
-        status = "Finished"
-      end
+      game = switch_player(game)
     end
 
-    %{game | squares: changedSquares, black_pieces: black_pieces, white_pieces: white_pieces, blackWasNext: shouldTurnColor, blackIsNext: shouldTurnColor, availableMoves: availableSquares, current_player: current_player, status: status}
+    %{game | squares: changedSquares, black_pieces: black_pieces, white_pieces: white_pieces, blackWasNext: shouldTurnColor, blackIsNext: shouldTurnColor, availableMoves: availableSquares}
+  end
+
+  # switch player since the current player does not have valid moves
+  def switch_player(game) do
+    black_player = game.black_player
+    white_player = game.white_player
+    current_player = game.current_player
+    status = game.status
+
+    if current_player == black_player do
+      current_player = white_player
+    else
+      current_player = black_player
+    end
+
+    if Enum.count(client_view(game).availableMoves) == 0 do
+      status = "Finished"
+    end
+
+    %{game | current_player: current_player, status: status}
   end
 
   @doc """
