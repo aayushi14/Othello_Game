@@ -6,7 +6,7 @@
     "watch": "brunch watch --stdin"
   },
   "dependencies": {
-    "bootstrap": "^4.0.0",
+    "bootstrap": "^4.3.1",
     "jquery": "^3.5.0",
     "node-sass": "^4.13.1",
     "phoenix": "file:../deps/phoenix",
